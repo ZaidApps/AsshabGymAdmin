@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "ashhabgymweb"
+  },
+  "targets": {
+    "ashhabgymweb": {
+      "hosting": {
+        "main": ["ashhabgymweb.web.app"],
+        "admin": ["ashhabgymwebadmin"]
+      }
+    }
+  }
+}
