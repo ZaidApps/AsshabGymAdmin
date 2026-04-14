@@ -4,6 +4,7 @@ class Member {
   final String? deviceId;
   final String? memberDocId;
   final String? phoneNumber;
+  final String? memberName;
   final String membershipStatus;
   final Timestamp? subscriptionStartDate;
   final Timestamp? subscriptionExpiryDate;
@@ -14,6 +15,7 @@ class Member {
     this.deviceId,
     this.memberDocId,
     this.phoneNumber,
+    this.memberName,
     required this.membershipStatus,
     this.subscriptionStartDate,
     this.subscriptionExpiryDate,
@@ -24,9 +26,10 @@ class Member {
   factory Member.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Member(
-      memberDocId: doc.id,
       deviceId: data['device_id'],
+      memberDocId: doc.id,
       phoneNumber: data['phone_number'],
+      memberName: data['member_name'],
       membershipStatus: data['membership_status'] ?? 'pending',
       subscriptionStartDate: data['subscription_start_date'],
       subscriptionExpiryDate: data['subscription_expiry_date'],
@@ -38,7 +41,9 @@ class Member {
   Map<String, dynamic> toFirestore() {
     return {
       'device_id': deviceId,
+      'member_doc_id': memberDocId,
       'phone_number': phoneNumber,
+      'member_name': memberName,
       'membership_status': membershipStatus,
       'subscription_start_date': subscriptionStartDate,
       'subscription_expiry_date': subscriptionExpiryDate,
@@ -97,6 +102,7 @@ class CheckIn {
   final String? deviceId;
   final String? memberDocId;
   final String? phoneNumber;
+  final String? memberName;
   final String checkinDate;
   final String checkinTime;
   final String deviceType;
@@ -106,6 +112,7 @@ class CheckIn {
     this.deviceId,
     this.memberDocId,
     this.phoneNumber,
+    this.memberName,
     required this.checkinDate,
     required this.checkinTime,
     required this.deviceType,
@@ -118,10 +125,33 @@ class CheckIn {
       deviceId: data['device_id'],
       memberDocId: data['member_doc_id'],
       phoneNumber: data['phone_number'],
+      memberName: data['member_name'],
       checkinDate: data['checkin_date'],
       checkinTime: data['checkin_time'],
       deviceType: data['device_type'],
       timestamp: data['timestamp'],
+    );
+  }
+
+  CheckIn copyWith({
+    String? deviceId,
+    String? memberDocId,
+    String? phoneNumber,
+    String? memberName,
+    String? checkinDate,
+    String? checkinTime,
+    String? deviceType,
+    Timestamp? timestamp,
+  }) {
+    return CheckIn(
+      deviceId: deviceId ?? this.deviceId,
+      memberDocId: memberDocId ?? this.memberDocId,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      memberName: memberName ?? this.memberName,
+      checkinDate: checkinDate ?? this.checkinDate,
+      checkinTime: checkinTime ?? this.checkinTime,
+      deviceType: deviceType ?? this.deviceType,
+      timestamp: timestamp ?? this.timestamp,
     );
   }
 }
@@ -130,6 +160,7 @@ class ExpiredCheckInAttempt {
   final String? deviceId;
   final String? memberDocId;
   final String? phoneNumber;
+  final String? memberName;
   final String attemptDate;
   final String attemptTime;
   final Timestamp? subscriptionExpiryDate;
@@ -139,6 +170,7 @@ class ExpiredCheckInAttempt {
     this.deviceId,
     this.memberDocId,
     this.phoneNumber,
+    this.memberName,
     required this.attemptDate,
     required this.attemptTime,
     this.subscriptionExpiryDate,
@@ -151,6 +183,7 @@ class ExpiredCheckInAttempt {
       deviceId: data['device_id'],
       memberDocId: data['member_doc_id'],
       phoneNumber: data['phone_number'],
+      memberName: data['member_name'],
       attemptDate: data['attempt_date'],
       attemptTime: data['attempt_time'],
       subscriptionExpiryDate: data['subscription_expiry_date'],

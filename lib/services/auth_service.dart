@@ -145,6 +145,17 @@ class AuthService {
     }
   }
 
+  // Delete user directly (admin only, for users they created)
+  Future<bool> deleteUserDirectly(String userId) async {
+    try {
+      await _firestore.collection('admin_users').doc(userId).delete();
+      return true;
+    } catch (e) {
+      print('Error deleting user: $e');
+      return false;
+    }
+  }
+
   // Request user deletion (requires admin approval)
   Future<bool> requestUserDeletion({
     required String targetUserId,

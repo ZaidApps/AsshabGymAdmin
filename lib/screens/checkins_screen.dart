@@ -12,100 +12,199 @@ class CheckinsScreen extends StatefulWidget {
 
 class _CheckinsScreenState extends State<CheckinsScreen> {
   final FirebaseService _firebaseService = FirebaseService();
+  final _searchController = TextEditingController();
+  DateTime? _selectedDate;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Today\'s Check-ins'),
+        title: const Text('Check-ins'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            onPressed: _selectDate,
+            icon: const Icon(Symbols.calendar_month),
+            tooltip: 'Select Date',
+          ),
+          IconButton(
+            onPressed: _clearSearch,
+            icon: const Icon(Symbols.clear),
+            tooltip: 'Clear Search',
+          ),
+        ],
       ),
-      body: StreamBuilder<List<CheckIn>>(
-        stream: _firebaseService.getTodayCheckIns(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          }
-
-          final checkins = snapshot.data ?? [];
-
-          if (checkins.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Symbols.check_circle,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'No check-ins today',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Member check-ins will appear here',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search by name or phone',
+                prefixIcon: const Icon(Symbols.search),
+                border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  onPressed: _clearSearch,
+                  icon: const Icon(Symbols.clear),
+                ),
               ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: checkins.length,
-            itemBuilder: (context, index) {
-              final checkin = checkins[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.green,
-                    child: const Icon(
-                      Symbols.check_circle,
-                      color: Colors.white,
-                    ),
-                  ),
-                  title: Text(
-                    checkin.phoneNumber ?? 'No phone number',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Device ID: ${checkin.deviceId ?? "Unknown"}'),
-                      Text('Platform: ${checkin.deviceType.toUpperCase()}'),
-                      Text('Time: ${checkin.checkinTime}'),
-                    ],
-                  ),
-                  trailing: Text(
-                    checkin.checkinDate,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
+          ),
+          
+          // Selected Date Display
+          if (_selectedDate != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Selected Date: ${_formatDate(_selectedDate!)}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                 ),
-              );
-            },
-          );
-        },
+              ),
+            ),
+          Expanded(
+            child: StreamBuilder<List<CheckIn>>(
+              stream: _selectedDate != null 
+                  ? _firebaseService.getCheckInsByDate(_selectedDate!)
+                  : _firebaseService.getTodayCheckIns(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                }
+
+                final checkins = _filterCheckIns(snapshot.data ?? []);
+
+                if (checkins.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Symbols.check_circle,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'No check-ins today',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Member check-ins will appear here',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: checkins.length,
+                  itemBuilder: (context, index) {
+                    final checkin = checkins[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.green,
+                          child: const Icon(
+                            Symbols.check_circle,
+                            color: Colors.white,
+                          ),
+                        ),
+                        title: Text(
+                          checkin.memberName ?? checkin.phoneNumber ?? 'No phone number',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Device ID: ${checkin.deviceId ?? "Unknown"}'),
+                            Text('Platform: ${checkin.deviceType.toUpperCase()}'),
+                            Text('Time: ${checkin.checkinTime}'),
+                          ],
+                        ),
+                        trailing: Text(
+                          checkin.checkinDate,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchController.clear();
+    });
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  List<CheckIn> _filterCheckIns(List<CheckIn> checkins) {
+    if (_searchController.text.isEmpty) {
+      return checkins;
+    }
+
+    final searchQuery = _searchController.text.toLowerCase();
+    return checkins.where((checkin) {
+      final memberName = checkin.memberName?.toLowerCase() ?? '';
+      final phoneNumber = checkin.phoneNumber?.toLowerCase() ?? '';
+      return memberName.contains(searchQuery) || phoneNumber.contains(searchQuery);
+    }).toList();
   }
 }
 
@@ -187,7 +286,7 @@ class _ExpiredAttemptsScreenState extends State<ExpiredAttemptsScreen> {
                     ),
                   ),
                   title: Text(
-                    attempt.phoneNumber ?? 'No phone number',
+                    attempt.memberName ?? attempt.phoneNumber ?? 'No phone number',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Column(

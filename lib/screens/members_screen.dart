@@ -120,7 +120,7 @@ class MemberCard extends StatelessWidget {
           ),
         ),
         title: Text(
-          member.phoneNumber ?? 'No phone number',
+          member.memberName ?? member.phoneNumber ?? 'No phone number',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
@@ -265,7 +265,7 @@ class MemberCard extends StatelessWidget {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Delete Member'),
-          content: Text('Are you sure you want to delete ${member.phoneNumber ?? 'this member'}? This action cannot be undone.'),
+          content: Text('Are you sure you want to delete ${member.memberName ?? member.phoneNumber ?? 'this member'}? This action cannot be undone.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -302,7 +302,7 @@ class MemberCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Member: ${member.phoneNumber ?? 'Unknown'}'),
+              Text('Member: ${member.memberName ?? member.phoneNumber ?? 'Unknown'}'),
               const SizedBox(height: 8),
               const Text('This deletion request will require admin approval.'),
               const SizedBox(height: 8),
@@ -334,7 +334,7 @@ class MemberCard extends StatelessWidget {
         final success = await _firebaseService.requestMemberDeletion(
           memberDocId: member.memberDocId!,
           memberEmail: member.phoneNumber ?? 'Unknown',
-          memberName: member.phoneNumber ?? 'Unknown',
+          memberName: member.memberName ?? member.phoneNumber ?? 'Unknown',
           requestedBy: currentUser.userId!,
           requestedByEmail: currentUser.email,
           reason: reasonController.text.isNotEmpty ? reasonController.text : null,
@@ -393,6 +393,7 @@ class MemberCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              _buildDetailRow('Member Name', member.memberName ?? 'Not set'),
               _buildDetailRow('Device ID', member.deviceId ?? 'Unknown'),
               _buildDetailRow('Phone Number', member.phoneNumber ?? 'Not set'),
               _buildDetailRow('Status', member.membershipStatus.toUpperCase()),

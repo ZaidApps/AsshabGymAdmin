@@ -128,10 +128,11 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
       context: context,
       builder: (context) => ActivateMemberDialog(
         device: device,
-        onActivate: (phoneNumber, startDate, expiryDate) async {
+        onActivate: (phoneNumber, memberName, startDate, expiryDate) async {
           final success = await _firebaseService.activateMember(
             memberDocId: device.memberDocId!,
             phoneNumber: phoneNumber,
+            memberName: memberName,
             subscriptionStartDate: startDate,
             subscriptionExpiryDate: expiryDate,
           );

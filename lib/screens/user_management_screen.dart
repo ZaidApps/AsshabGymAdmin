@@ -178,6 +178,8 @@ class UserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCurrentUser = _authService.currentUser?.userId == user.userId;
+    final isCreatedByCurrentUser = _authService.currentUser?.userId == user.createdBy;
+    final canManageUser = _authService.isAdmin && (isCreatedByCurrentUser || user.createdBy == null);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -218,12 +220,22 @@ class UserCard extends StatelessWidget {
             : PopupMenuButton<String>(
                 onSelected: (value) => _handleAction(value, context),
                 itemBuilder: (context) => [
-                  if (_authService.isAdmin && user.isActive)
+                  // Admin can delete users they created
+                  if (canManageUser && user.isActive)
+                    const PopupMenuItem(value: 'delete', child: Text('Delete User')),
+                  // Admin can deactivate users they created
+                  if (canManageUser && user.isActive)
+                    const PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
+                  // Admin can reactivate users they deactivated
+                  if (canManageUser && !user.isActive)
+                    const PopupMenuItem(value: 'activate', child: Text('Activate')),
+                  // Super admin can manage all users (existing functionality)
+                  if (_authService.isAdmin && !canManageUser && user.isActive)
                     PopupMenuItem(
                       value: 'deactivate',
                       child: Text(user.isRegularUser ? 'Request Deletion' : 'Deactivate'),
                     ),
-                  if (_authService.isAdmin && !user.isActive)
+                  if (_authService.isAdmin && !canManageUser && !user.isActive)
                     const PopupMenuItem(value: 'activate', child: Text('Activate')),
                   const PopupMenuItem(value: 'details', child: Text('View Details')),
                 ],
@@ -238,15 +250,48 @@ class UserCard extends StatelessWidget {
         _toggleUserStatus(context, true);
         break;
       case 'deactivate':
-        if (user.isRegularUser) {
-          _requestUserDeletion(context);
-        } else {
-          _toggleUserStatus(context, false);
-        }
+        _toggleUserStatus(context, false);
+        break;
+      case 'delete':
+        _deleteUser(context);
         break;
       case 'details':
         _showUserDetails(context);
         break;
+    }
+  }
+
+  Future<void> _deleteUser(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete User'),
+        content: Text('Are you sure you want to delete ${user.displayName} (${user.email})? This action cannot be undone and the user will not be able to login again.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await _authService.deleteUserDirectly(user.userId!);
+      
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(success ? 'User deleted successfully' : 'Failed to delete user'),
+            backgroundColor: success ? Colors.green : Colors.red,
+          ),
+        );
+      }
     }
   }
 

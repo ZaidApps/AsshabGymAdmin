@@ -4,7 +4,7 @@ import '../models/member.dart';
 
 class ActivateMemberDialog extends StatefulWidget {
   final PendingDeviceRegistration device;
-  final Function(String phoneNumber, DateTime startDate, DateTime expiryDate) onActivate;
+  final Function(String phoneNumber, String memberName, DateTime startDate, DateTime expiryDate) onActivate;
 
   const ActivateMemberDialog({
     super.key,
@@ -19,12 +19,14 @@ class ActivateMemberDialog extends StatefulWidget {
 class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
+  final _nameController = TextEditingController();
   DateTime? _selectedStartDate;
   DateTime? _selectedExpiryDate;
 
   @override
   void dispose() {
     _phoneController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -71,6 +73,24 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // Member Name Field
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Member Name',
+                  hintText: 'Enter member name',
+                  prefixIcon: Icon(Symbols.person),
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter member name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
 
               // Phone Number Field
               TextFormField(
@@ -240,9 +260,11 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
 
     widget.onActivate(
       _phoneController.text,
+      _nameController.text.isNotEmpty ? _nameController.text : _phoneController.text,
       _selectedStartDate!,
       _selectedExpiryDate!,
     );
+    Navigator.pop(context);
   }
 
   String _formatDate(DateTime date) {

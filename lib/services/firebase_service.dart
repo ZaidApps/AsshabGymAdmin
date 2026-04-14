@@ -176,6 +176,7 @@ class FirebaseService {
   Future<bool> activateMember({
     required String memberDocId,
     required String phoneNumber,
+    required String memberName,
     required DateTime subscriptionStartDate,
     required DateTime subscriptionExpiryDate,
   }) async {
@@ -191,6 +192,7 @@ class FirebaseService {
       await _membersCollection.doc(memberDocId).update({
         'membership_status': 'active',
         'phone_number': phoneNumber,
+        'member_name': memberName,
         'subscription_start_date': Timestamp.fromDate(subscriptionStartDate),
         'subscription_expiry_date': Timestamp.fromDate(subscriptionExpiryDate),
         'updated_at': FieldValue.serverTimestamp(),
@@ -259,10 +261,63 @@ class FirebaseService {
         .map((snapshot) => snapshot.docs
             .map((doc) => CheckIn.fromFirestore(doc))
             .toList())
-        .map((checkins) {
+        .asyncMap((checkins) async {
+          // Populate member names for check-ins that don't have them
+          final updatedCheckins = <CheckIn>[];
+          for (final checkin in checkins) {
+            if (checkin.memberName == null && checkin.memberDocId != null) {
+              // Fetch member data to get the name
+              final memberDoc = await _membersCollection.doc(checkin.memberDocId!).get();
+              if (memberDoc.exists) {
+                final memberData = memberDoc.data() as Map<String, dynamic>;
+                final memberName = memberData['member_name'] as String?;
+                if (memberName != null && memberName.isNotEmpty) {
+                  updatedCheckins.add(checkin.copyWith(memberName: memberName));
+                  continue;
+                }
+              }
+            }
+            updatedCheckins.add(checkin);
+          }
+          
           // Sort locally instead of using orderBy
-          checkins.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-          return checkins;
+          updatedCheckins.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return updatedCheckins;
+        });
+  }
+
+  // Get check-ins by specific date
+  Stream<List<CheckIn>> getCheckInsByDate(DateTime date) {
+    final dateString = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    
+    return _checkinsCollection
+        .where('checkin_date', isEqualTo: dateString)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => CheckIn.fromFirestore(doc))
+            .toList())
+        .asyncMap((checkins) async {
+          // Populate member names for check-ins that don't have them
+          final updatedCheckins = <CheckIn>[];
+          for (final checkin in checkins) {
+            if (checkin.memberName == null && checkin.memberDocId != null) {
+              // Fetch member data to get the name
+              final memberDoc = await _membersCollection.doc(checkin.memberDocId!).get();
+              if (memberDoc.exists) {
+                final memberData = memberDoc.data() as Map<String, dynamic>;
+                final memberName = memberData['member_name'] as String?;
+                if (memberName != null && memberName.isNotEmpty) {
+                  updatedCheckins.add(checkin.copyWith(memberName: memberName));
+                  continue;
+                }
+              }
+            }
+            updatedCheckins.add(checkin);
+          }
+          
+          // Sort locally instead of using orderBy
+          updatedCheckins.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return updatedCheckins;
         });
   }
 
