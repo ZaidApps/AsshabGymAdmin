@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 import 'admin_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,36 +29,60 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue.shade50,
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceColor,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(32.0),
+                padding: const EdgeInsets.all(40.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Logo and Title
-                      Icon(
-                        Symbols.fitness_center,
-                        size: 64,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      const SizedBox(height: 16),
+                    Container(
+                    constraints: const BoxConstraints(
+                      maxHeight: 300,
+                      maxWidth: 400,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Image.asset(
+                      'assets/images/ashab_logo.jpg',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                      const SizedBox(height: 24),
                       Text(
                         'Gym Admin',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
+                        style: AppTheme.heading2.copyWith(
+                          color: AppTheme.onSurfaceColor,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 8),
+                      Text(
+                        'Welcome back! Please login to continue',
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: AppTheme.onBackgroundColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
                       Text(
                         'Sign in to manage your gym',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -69,13 +94,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Email Field
                       TextFormField(
                         controller: _emailController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Email',
                           hintText: 'Enter your email',
-                          prefixIcon: const Icon(Symbols.email),
-                          border: const OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.grey[50],
+                          prefixIcon: Icon(Symbols.email, color: AppTheme.onBackgroundColor),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
@@ -93,13 +115,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Password Field
                       TextFormField(
                         controller: _passwordController,
+                        obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           hintText: 'Enter your password',
-                          prefixIcon: const Icon(Symbols.lock),
+                          prefixIcon: const Icon(Symbols.lock, color: AppTheme.onBackgroundColor),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Symbols.visibility : Symbols.visibility_off,
+                              _obscurePassword ? Symbols.visibility_off : Symbols.visibility,
+                              color: AppTheme.onBackgroundColor,
                             ),
                             onPressed: () {
                               setState(() {
@@ -107,11 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               });
                             },
                           ),
-                          border: const OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.grey[50],
                         ),
-                        obscureText: _obscurePassword,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
@@ -124,62 +144,73 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Login Button
                       SizedBox(
                         width: double.infinity,
-                        height: 50,
+                        height: 56,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
+                            backgroundColor: AppTheme.primaryColor,
                             foregroundColor: Colors.white,
+                            elevation: 0,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(16),
                             ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                           child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text(
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
                                   'Sign In',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: AppTheme.bodyLarge.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
 
                       // Help Text
-                      Container(
-                        padding: const EdgeInsets.all(12),
+                  /*    Container(
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.blue.shade200),
+                          color: AppTheme.primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.primaryColor.withOpacity(0.2)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Login Information',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue.shade700,
+                              style: AppTheme.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Default password: your email prefix + 123',
+                              style: AppTheme.bodySmall.copyWith(
+                                color: AppTheme.onBackgroundColor,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Default password: your email prefix + 123',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.blue.shade600,
-                              ),
-                            ),
-                            Text(
                               'Example: user@domain.com -> user123',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.blue.shade600,
+                              style: AppTheme.bodySmall.copyWith(
+                                color: AppTheme.onBackgroundColor,
                               ),
                             ),
                           ],
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),

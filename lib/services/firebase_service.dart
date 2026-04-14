@@ -1,3 +1,4 @@
+import 'package:asshab_gym_web_admin/models/member_history.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/member.dart';
 import '../models/admin_user.dart';
@@ -11,6 +12,7 @@ class FirebaseService {
   CollectionReference get _checkinsCollection => _firestore.collection('checkins');
   CollectionReference get _expiredAttemptsCollection => _firestore.collection('expired_checkin_attempts');
   CollectionReference get _memberDeletionRequestsCollection => _firestore.collection('member_deletion_requests');
+  CollectionReference get _memberHistoryCollection => _firestore.collection('member_history');
 
   // Get all pending device registrations
   Stream<List<PendingDeviceRegistration>> getPendingRegistrations() {
@@ -329,6 +331,71 @@ class FirebaseService {
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => ExpiredCheckInAttempt.fromFirestore(doc))
+            .toList())
+        .asyncMap((expiredAttempts) async {
+          // Populate member names for expired attempts that don't have them
+          final updatedAttempts = <ExpiredCheckInAttempt>[];
+          for (final attempt in expiredAttempts) {
+            if (attempt.memberName == null && attempt.memberDocId != null) {
+              // Fetch member data to get the name
+              final memberDoc = await _membersCollection.doc(attempt.memberDocId!).get();
+              if (memberDoc.exists) {
+                final memberData = memberDoc.data() as Map<String, dynamic>;
+                final memberName = memberData['member_name'] as String?;
+                if (memberName != null && memberName.isNotEmpty) {
+                  updatedAttempts.add(attempt.copyWith(memberName: memberName));
+                  continue;
+                }
+              }
+            }
+            updatedAttempts.add(attempt);
+          }
+          
+          // Sort locally instead of using orderBy
+          updatedAttempts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return updatedAttempts;
+        });
+  }
+
+  // Add member history record
+  Future<bool> addMemberHistory({
+    required String memberDocId,
+    required String action,
+    required String oldValue,
+    required String newValue,
+    String? fieldName,
+    required String performedBy,
+    String? performedByEmail,
+    String? reason,
+  }) async {
+    try {
+      await _memberHistoryCollection.add({
+        'member_doc_id': memberDocId,
+        'action': action,
+        'old_value': oldValue,
+        'new_value': newValue,
+        'field_name': fieldName,
+        'performed_by': performedBy,
+        'performed_by_email': performedByEmail,
+        'reason': reason,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      return true;
+    } catch (e) {
+      print('Error adding member history: $e');
+      return false;
+    }
+  }
+
+  // Get member history
+  Stream<List<MemberHistory>> getMemberHistory(String memberDocId) {
+    return _memberHistoryCollection
+        .where('member_doc_id', isEqualTo: memberDocId)
+        .orderBy('timestamp', descending: true)
+        .limit(100)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => MemberHistory.fromFirestore(doc))
             .toList());
   }
 
@@ -342,26 +409,44 @@ class FirebaseService {
       
       int activeCount = 0;
       int pendingCount = 0;
+      int inactiveCount = 0;
+      int expiredCount = 0;
       
       for (final doc in membersSnapshot.docs) {
         final member = Member.fromFirestore(doc);
         if (member.isActive) {
           activeCount++;
-        } else {
+        } else if (member.isPending) {
           pendingCount++;
+        } else if (member.isInactive) {
+          inactiveCount++;
         }
+          // Check if subscription is expired
+          if (member.subscriptionExpiryDate != null) {
+            final expiryDate = member.subscriptionExpiryDate!.toDate();
+            if (expiryDate.isBefore(DateTime.now())) {
+              expiredCount++;
+            }
+          }
+        
       }
 
       return {
+        'total': activeCount + pendingCount + inactiveCount,
         'active': activeCount,
         'pending': pendingCount,
+        'inactive': inactiveCount,
+        'expired': expiredCount,
         'pending_registrations': pendingSnapshot.docs.length,
       };
     } catch (e) {
       print('Error getting member stats: $e');
       return {
+        'total': 0,
         'active': 0,
         'pending': 0,
+        'inactive': 0,
+        'expired': 0,
         'pending_registrations': 0,
       };
     }

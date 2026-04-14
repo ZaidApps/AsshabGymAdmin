@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import '../models/member.dart';
+import '../models/admin_user.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_service.dart';
-import 'pending_devices_screen.dart';
+import '../theme/app_theme.dart';
 import 'members_screen.dart';
 import 'checkins_screen.dart';
+import 'expired_checkins_screen.dart';
+import 'member_history_screen.dart';
 import 'user_management_screen.dart';
-import 'login_screen.dart';
-import '../widgets/user_deletion_requests_dialog.dart';
-import '../widgets/member_deletion_requests_dialog.dart';
+import 'pending_devices_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -20,259 +22,327 @@ class AdminDashboard extends StatefulWidget {
 class _AdminDashboardState extends State<AdminDashboard> {
   final FirebaseService _firebaseService = FirebaseService();
   final AuthService _authService = AuthService();
-  Map<String, int> _stats = {
-    'active': 0,
-    'pending': 0,
-    'pending_registrations': 0,
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStats();
-  }
-
-  Future<void> _loadStats() async {
-    final stats = await _firebaseService.getMemberStats();
-    setState(() {
-      _stats = stats;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: Row(
           children: [
-            const Text('Gym Admin Dashboard'),
-            const SizedBox(width: 16),
-            if (_authService.currentUser != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+            Icon(
+              Symbols.dashboard,
+              color: AppTheme.onSurfaceColor,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Dashboard',
+                  style: AppTheme.heading2.copyWith(
+                    color: AppTheme.onSurfaceColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Symbols.person,
-                      size: 16,
-                      color: Colors.grey[600],
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _authService.currentUser!.email,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
+                FutureBuilder<String?>(
+                  future: _authService.getCurrentUserEmail(),
+                  builder: (context, snapshot) {
+                    final email = snapshot.data;
+                    if (email != null) {
+                      return Text(
+                        email!,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
-              ),
+              ],
+            ),
           ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           IconButton(
-            onPressed: _loadStats,
-            icon: const Icon(Symbols.refresh),
-            tooltip: 'Refresh',
+            onPressed: _refreshDashboard,
+            icon: Icon(
+              Symbols.refresh,
+              color: AppTheme.onSurfaceColor,
+              size: 20,
+            ),
+            tooltip: 'Refresh Dashboard',
           ),
-          IconButton(
-            onPressed: _debugAuth,
-            icon: const Icon(Symbols.bug_report),
-            tooltip: 'Debug Auth',
-          ),
-          IconButton(
-            onPressed: _logout,
-            icon: const Icon(Symbols.logout),
-            tooltip: 'Logout',
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _loadStats,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Statistics Cards
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      'Active Members',
-                      _stats['active']!.toString(),
-                      Colors.green,
-                      Symbols.group,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildStatCard(
-                      'Pending Members',
-                      _stats['pending']!.toString(),
-                      Colors.orange,
-                      Symbols.person_alert,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildStatCard(
-                'Pending Registrations',
-                _stats['pending_registrations']!.toString(),
-                Colors.blue,
-                Symbols.device_hub,
-              ),
-              const SizedBox(height: 32),
-
-              // Action Buttons
-              const Text(
-                'Actions',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          PopupMenuButton<String>(
+            icon: Icon(
+              Symbols.more_vert,
+              color: AppTheme.onSurfaceColor,
+              size: 20,
+            ),
+            onSelected: _handleMenuAction,
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Symbols.logout, size: 16),
+                    SizedBox(width: 8),
+                    Text('Logout'),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.5,
-                children: [
-                  _buildActionCard(
-                    'Pending Devices',
-                    'Review and activate new device registrations',
-                    Symbols.devices,
-                    Colors.blue,
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PendingDevicesScreen(),
-                      ),
-                    ),
-                  ),
-                  _buildActionCard(
-                    'Members',
-                    'View and manage all gym members',
-                    Symbols.group,
-                    Colors.green,
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MembersScreen(),
-                      ),
-                    ),
-                  ),
-                  _buildActionCard(
-                    'Today\'s Check-ins',
-                    'View member check-ins for today',
-                    Symbols.check_circle,
-                    Colors.purple,
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CheckinsScreen(),
-                      ),
-                    ),
-                  ),
-                  _buildActionCard(
-                    'Expired Attempts',
-                    'View failed check-in attempts',
-                    Symbols.error,
-                    Colors.red,
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ExpiredAttemptsScreen(),
-                      ),
-                    ),
-                  ),
-                  _buildActionCard(
-                    'User Management',
-                    'Manage admin users and permissions',
-                    Symbols.admin_panel_settings,
-                    Colors.purple,
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const UserManagementScreen(),
-                      ),
-                    ),
-                  ),
-                  if (_authService.isAdmin)
-                    _buildActionCard(
-                      'Member Deletions',
-                      'Review member deletion requests',
-                      Symbols.delete_forever,
-                      Colors.red,
-                      () => _showMemberDeletionRequests(),
-                    ),
-                 /* _buildActionCard(
-                    'Deletion Requests',
-                    'Review user deletion approvals',
-                    Symbols.approval,
-                    Colors.orange,
-                    () => _showDeletionRequests(),
-                  ),*/
-                ],
               ),
             ],
           ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Welcome Section
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryColor.withOpacity(0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Welcome back!',
+                    style: AppTheme.heading1.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Here\'s what\'s happening at your gym today',
+                    style: AppTheme.bodyLarge.copyWith(
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Stats Grid
+            StreamBuilder<List<CheckIn>>(
+              stream: _firebaseService.getTodayCheckIns(),
+              builder: (context, checkinsSnapshot) {
+                return FutureBuilder<Map<String, int>>(
+                  future: _firebaseService.getMemberStats(),
+                  builder: (context, statsSnapshot) {
+                    if (statsSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    
+                    final stats = statsSnapshot.data ?? {
+                      'total': 0,
+                      'active': 0,
+                      'pending': 0,
+                      'inactive': 0,
+                      'expired': 0,
+                    };
+                    
+                    final todayCheckins = checkinsSnapshot.data?.length ?? 0;
+                    
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        final crossAxisCount = constraints.maxWidth > 1200 ? 6 :
+                                            constraints.maxWidth > 800 ? 3 : 2;
+                        
+                        return GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 1.0,
+                          children: [
+                            _buildStatCard('Total Members', stats['total'].toString(), AppTheme.primaryColor, Symbols.people),
+                            _buildStatCard('Active Members', stats['active'].toString(), AppTheme.successColor, Symbols.person_check),
+                            _buildStatCard('Inactive Members', stats['inactive'].toString(), Colors.grey, Symbols.person_off),
+                            _buildStatCard('Expired Members', stats['expired'].toString(), AppTheme.errorColor, Icons.event_busy),
+                            _buildStatCard('Today\'s Check-ins', todayCheckins.toString(), AppTheme.accentColor, Symbols.check_circle),
+                            _buildStatCard('Pending Requests', stats['pending'].toString(), AppTheme.warningColor, Symbols.pending_actions),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Quick Actions
+            Text(
+              'Quick Actions',
+              style: AppTheme.heading3.copyWith(
+                color: AppTheme.onSurfaceColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount = constraints.maxWidth > 1200 ? 4 :
+                                    constraints.maxWidth > 800 ? 2 : 1;
+                
+                return GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 1.4,
+                  children: [
+                    _buildActionCard(
+                      'Members',
+                      'Manage gym members',
+                      Symbols.people,
+                      AppTheme.primaryColor,
+                      () => _navigateTo(const MembersScreen()),
+                    ),
+                    _buildActionCard(
+                      'Check-ins',
+                      'View check-in history',
+                      Symbols.check_circle,
+                      AppTheme.successColor,
+                      () => _navigateTo(const CheckinsScreen()),
+                    ),
+                    _buildActionCard(
+                      'Expired Check-ins',
+                      'View expired check-in attempts',
+                      Symbols.warning,
+                      AppTheme.errorColor,
+                      () => _navigateTo(const ExpiredCheckinsScreen()),
+                    ),
+                    _buildActionCard(
+                      'User Management',
+                      'Manage admin users',
+                      Symbols.admin_panel_settings,
+                      AppTheme.accentColor,
+                      () => _navigateTo(const UserManagementScreen()),
+                    ),
+                    _buildActionCard(
+                      'Member History',
+                      'View member activity history',
+                      Symbols.history,
+                      Colors.purple,
+                      () => _showMemberHistorySelector(),
+                    ),
+                    _buildActionCard(
+                      'Pending Devices',
+                      'Review device requests',
+                      Symbols.devices,
+                      AppTheme.warningColor,
+                      () => _navigateTo(const PendingDevicesScreen()),
+                    ),
+                  ],
+                );
+              },
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Recent Activity
+           /* Text(
+              'Recent Activity',
+              style: AppTheme.heading3.copyWith(
+                color: AppTheme.onSurfaceColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),*/
+            
+          /*  Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Column(
+                children: [
+                  _buildActivityItem('New member registration', '2 hours ago'),
+                  _buildActivityItem('Payment received', '4 hours ago'),
+                  _buildActivityItem('Device added', '6 hours ago'),
+                  _buildActivityItem('Member subscription renewed', '8 hours ago'),
+                ],
+              ),
+            ),*/
+          ],
         ),
       ),
     );
   }
 
   Widget _buildStatCard(String title, String value, Color color, IconData icon) {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: color, size: 24),
-                const Spacer(),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                child: Icon(icon, color: color, size: 16),
               ),
+              const Spacer(),
+              Text(
+                value,
+                style: AppTheme.heading3.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.onBackgroundColor,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -284,137 +354,142 @@ class _AdminDashboardState extends State<AdminDashboard> {
     Color color,
     VoidCallback onTap,
   ) {
-    return Card(
-      elevation: 2,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: color, size: 32),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, color: color, size: 32),
+                const SizedBox(height: 12),
+                Text(
+                  title,
+                  style: AppTheme.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.onBackgroundColor,
+                  ),
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
+  Widget _buildActivityItem(String title, String time) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTheme.bodyMedium.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Text(
+            time,
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.onBackgroundColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateTo(Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+  }
+
+  void _handleMenuAction(String action) {
+    switch (action) {
+      case 'logout':
+        _logout();
+        break;
+    }
+  }
+
+  void _refreshDashboard() {
+    // Trigger a rebuild by calling setState
+    setState(() {});
+  }
+
+  void _showMemberHistorySelector() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Member'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Enter member phone number or search for a member to view their history:',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Symbols.phone, size: 20),
+              ),
+              onChanged: (value) {
+                // You can implement search functionality here
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _logout() {
     _authService.logout();
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => const LoginScreen(),
-      ),
-      (route) => false,
-    );
-  }
-
-  void _showDeletionRequests() {
-    final currentUser = _authService.currentUser;
-    
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please login first'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => UserDeletionRequestsDialog(
-        currentUserId: currentUser.userId ?? '',
-        onActionCompleted: () {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Action completed successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        },
-      ),
-    ).then((value) => null);
-  }
-
-  void _showMemberDeletionRequests() {
-    final currentUser = _authService.currentUser;
-    
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please login first'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (!currentUser.isAdmin) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Only admins can review member deletion requests. Current role: ${currentUser.role.name}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => MemberDeletionRequestsDialog(
-        currentUserId: currentUser.userId ?? '',
-        onActionCompleted: () {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Action completed successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        },
-      ),
-    ).then((value) => null);
-  }
-
-  void _debugAuth() {
-    final currentUser = _authService.currentUser;
-    print('🔍 DEBUG AUTH STATE:');
-    print('👤 Current user: ${currentUser?.email}');
-    print('🔑 User role: ${currentUser?.role.name}');
-    print('🔑 Is admin: ${currentUser?.isAdmin}');
-    print('🔍 Auth service instance: ${_authService.hashCode}');
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Auth debug info printed to console'),
-        backgroundColor: Colors.blue,
-      ),
-    );
+    Navigator.pushReplacementNamed(context, '/login');
   }
 }

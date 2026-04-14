@@ -248,4 +248,9 @@ class AuthService {
     _currentUser = user;
     print('🔐 User logged in: ${user.email}, role: ${user.role.name}');
   }
+
+  // Get current user email
+  Future<String?> getCurrentUserEmail() async {
+    return _currentUser?.email;
+  }
 }

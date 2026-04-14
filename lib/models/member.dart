@@ -190,4 +190,26 @@ class ExpiredCheckInAttempt {
       timestamp: data['timestamp'],
     );
   }
+
+  ExpiredCheckInAttempt copyWith({
+    String? deviceId,
+    String? memberDocId,
+    String? phoneNumber,
+    String? memberName,
+    String? attemptDate,
+    String? attemptTime,
+    Timestamp? subscriptionExpiryDate,
+    Timestamp? timestamp,
+  }) {
+    return ExpiredCheckInAttempt(
+      deviceId: deviceId ?? this.deviceId,
+      memberDocId: memberDocId ?? this.memberDocId,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      memberName: memberName ?? this.memberName,
+      attemptDate: attemptDate ?? this.attemptDate,
+      attemptTime: attemptTime ?? this.attemptTime,
+      subscriptionExpiryDate: subscriptionExpiryDate ?? this.subscriptionExpiryDate,
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
 }

@@ -263,6 +263,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
       _nameController.text.isNotEmpty ? _nameController.text : _phoneController.text,
       _selectedStartDate!,
       _selectedExpiryDate!,
+     // _nameController.text
     );
     Navigator.pop(context);
   }
