@@ -1,3 +1,4 @@
+import 'package:asshab_gym_web_admin/models/member.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member_history.dart';
@@ -19,209 +20,376 @@ class MemberHistoryScreen extends StatefulWidget {
 class _MemberHistoryScreenState extends State<MemberHistoryScreen> {
   final FirebaseService _firebaseService = FirebaseService();
   String _selectedFilter = 'all';
+  Member? _member;
+  bool _isLoadingMember = true;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(
-              Symbols.history,
+  void initState() {
+    super.initState();
+    _fetchMemberData();
+  }
+
+  Future<void> _fetchMemberData() async {
+    try {
+      final member = await _firebaseService.getMemberById(widget.memberDocId);
+      if (mounted) {
+        setState(() {
+          _member = member;
+          _isLoadingMember = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMember = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading member data: $e'),
+            backgroundColor: AppTheme.errorColor,
+          ),
+        );
+      }
+    }
+  }
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: AppTheme.backgroundColor,
+    appBar: AppBar(
+      title: Row(
+        children: [
+          Icon(
+            Symbols.history,
+            color: AppTheme.onSurfaceColor,
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            'Member History',
+            style: AppTheme.heading2.copyWith(
               color: AppTheme.onSurfaceColor,
-              size: 24,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'Member History',
-              style: AppTheme.heading2.copyWith(
-                color: AppTheme.onSurfaceColor,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Container(
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: PopupMenuButton<String>(
-              icon: Icon(
-                Symbols.filter_list,
-                color: AppTheme.onSurfaceColor,
-                size: 20,
-              ),
-              onSelected: (value) {
-                setState(() {
-                  _selectedFilter = value;
-                });
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: 'all', child: Text('All Actions')),
-                const PopupMenuItem(value: 'status', child: Text('Status Changes')),
-                const PopupMenuItem(value: 'edit', child: Text('Member Edits')),
-                const PopupMenuItem(value: 'subscription', child: Text('Subscription')),
-                const PopupMenuItem(value: 'device', child: Text('Device Changes')),
-                const PopupMenuItem(value: 'delete', child: Text('Deletions')),
-              ],
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Member Info Header
-          Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primaryColor.withValues(alpha: 0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+      actions: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: PopupMenuButton<String>(
+            icon: Icon(
+              Symbols.filter_list,
+              color: AppTheme.onSurfaceColor,
+              size: 20,
             ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white,
-                  child: Icon(
-                    Symbols.person,
-                    color: AppTheme.primaryColor,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Member History',
-                        style: AppTheme.heading2.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+            onSelected: (value) {
+              setState(() {
+                _selectedFilter = value;
+              });
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'all', child: Text('All Actions')),
+              const PopupMenuItem(value: 'status', child: Text('Status Changes')),
+              const PopupMenuItem(value: 'edit', child: Text('Member Edits')),
+              const PopupMenuItem(value: 'subscription', child: Text('Subscription')),
+              const PopupMenuItem(value: 'device', child: Text('Device Changes')),
+              const PopupMenuItem(value: 'delete', child: Text('Deletions')),
+            ],
+          ),
+        ),
+      ],
+    ),
+    body: Column(
+      children: [
+        // Member Info Header
+        Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: _isLoadingMember
+              ? Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: CircularProgressIndicator(
+                        color: AppTheme.primaryColor,
+                        strokeWidth: 2,
                       ),
-                      const SizedBox(height: 4),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Loading...',
+                            style: AppTheme.heading2.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Fetching member information',
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : _member != null
+                  ? Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Symbols.person,
+                            color: AppTheme.primaryColor,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _member!.memberName ?? 'Unknown Member',
+                                style: AppTheme.heading2.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _member!.phoneNumber ?? 'No phone number',
+                                style: AppTheme.bodyMedium.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            _member!.membershipStatus.toUpperCase(),
+                            style: AppTheme.bodySmall.copyWith(
+                              color: AppTheme.primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Symbols.error,
+                            color: AppTheme.errorColor,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Member Not Found',
+                                style: AppTheme.heading2.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Unable to load member information',
+                                style: AppTheme.bodyMedium.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+        ),
+        
+        // History Timeline
+        Expanded(
+          child: StreamBuilder<List<MemberHistory>>(
+            stream: _firebaseService.getMemberHistory(widget.memberDocId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Symbols.error,
+                        size: 64,
+                        color: AppTheme.errorColor,
+                      ),
+                      const SizedBox(height: 16),
                       Text(
-                        'View all status changes and activity',
+                        'Error loading history',
+                        style: AppTheme.bodyLarge.copyWith(
+                          color: AppTheme.errorColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Please try again later',
                         style: AppTheme.bodyMedium.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: AppTheme.onBackgroundColor,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _createSampleData,
+                        icon: const Icon(Symbols.add, size: 18),
+                        label: const Text('Create Sample Data'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          
-          // History Timeline
-          Expanded(
-            child: StreamBuilder<List<MemberHistory>>(
-              stream: _firebaseService.getMemberHistory(widget.memberDocId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Symbols.error,
-                          size: 64,
-                          color: AppTheme.errorColor,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Error loading history',
-                          style: AppTheme.bodyLarge.copyWith(
-                            color: AppTheme.errorColor,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Please try again later',
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: AppTheme.onBackgroundColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                final history = snapshot.data ?? [];
-                final filteredHistory = _filterHistory(history);
-
-                if (filteredHistory.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceColor,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: Icon(
-                            Symbols.history,
-                            size: 64,
-                            color: AppTheme.onBackgroundColor,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'No history found',
-                          style: AppTheme.bodyLarge.copyWith(
-                            color: AppTheme.onBackgroundColor,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'No actions recorded for this member yet',
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: AppTheme.onBackgroundColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filteredHistory.length,
-                  itemBuilder: (context, index) {
-                    return HistoryTimelineItem(history: filteredHistory[index]);
-                  },
                 );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+              }
 
-  List<MemberHistory> _filterHistory(List<MemberHistory> history) {
+              final history = snapshot.data ?? [];
+              final filteredHistory = _filterHistory(history);
+
+              if (filteredHistory.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Icon(
+                          Symbols.history,
+                          size: 64,
+                          color: AppTheme.onBackgroundColor,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'No history found',
+                        style: AppTheme.bodyLarge.copyWith(
+                          color: AppTheme.onBackgroundColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'No actions recorded for this member yet',
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: AppTheme.onBackgroundColor,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: _createSampleData,
+                        icon: const Icon(Symbols.add, size: 18),
+                        label: const Text('Create Sample Data'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: filteredHistory.length,
+                itemBuilder: (context, index) {
+                  return HistoryTimelineItem(history: filteredHistory[index]);
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  ); // Close Scaffold
+} // Close build method
+// Make sure to close the class with } if this is the end of the class
+
+  Future<void> _createSampleData() async {
+  try {
+    final success = await _firebaseService.createSampleHistoryRecords(widget.memberDocId);
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sample history records created successfully!'),
+          backgroundColor: AppTheme.successColor,
+        ),
+      );
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to create sample data'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
+    }
+  }
+}
+
+List<MemberHistory> _filterHistory(List<MemberHistory> history) {
     switch (_selectedFilter) {
       case 'status':
         return history.where((h) => h.action == MemberHistory.ACTION_STATUS_CHANGED).toList();

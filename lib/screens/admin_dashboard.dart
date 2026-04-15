@@ -1,3 +1,4 @@
+import 'package:asshab_gym_web_admin/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member.dart';
@@ -8,7 +9,9 @@ import '../theme/app_theme.dart';
 import 'members_screen.dart';
 import 'checkins_screen.dart';
 import 'expired_checkins_screen.dart';
+import 'member_search_screen.dart';
 import 'member_history_screen.dart';
+import 'user_profile_screen.dart';
 import 'user_management_screen.dart';
 import 'pending_devices_screen.dart';
 
@@ -249,6 +252,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       () => _showMemberHistorySelector(),
                     ),
                     _buildActionCard(
+                      'User Profile',
+                      'Manage your account settings',
+                      Symbols.person,
+                      AppTheme.secondaryColor,
+                      () => _navigateTo(const UserProfileScreen()),
+                    ),
+                    _buildActionCard(
                       'Pending Devices',
                       'Review device requests',
                       Symbols.devices,
@@ -454,42 +464,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   void _showMemberHistorySelector() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Member'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Enter member phone number or search for a member to view their history:',
-              style: TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Symbols.phone, size: 20),
-              ),
-              onChanged: (value) {
-                // You can implement search functionality here
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const MemberSearchScreen(),
       ),
     );
   }
 
   void _logout() {
     _authService.logout();
-    Navigator.pushReplacementNamed(context, '/login');
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 }

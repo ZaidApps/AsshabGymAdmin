@@ -4,7 +4,7 @@ import '../models/member.dart';
 
 class EditMemberDialog extends StatefulWidget {
   final Member member;
-  final Function(String phoneNumber, DateTime expiryDate) onSave;
+  final Function(String phoneNumber, DateTime? startDate, DateTime? expiryDate) onSave;
 
   const EditMemberDialog({
     super.key,
@@ -19,12 +19,14 @@ class EditMemberDialog extends StatefulWidget {
 class _EditMemberDialogState extends State<EditMemberDialog> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
+  DateTime? _selectedStartDate;
   DateTime? _selectedExpiryDate;
 
   @override
   void initState() {
     super.initState();
     _phoneController.text = widget.member.phoneNumber ?? '';
+    _selectedStartDate = widget.member.subscriptionStartDate?.toDate();
     _selectedExpiryDate = widget.member.subscriptionExpiryDate?.toDate();
   }
 
@@ -98,6 +100,25 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
               ),
               const SizedBox(height: 16),
 
+              // Start Date Field
+              ListTile(
+                title: const Text('Subscription Start Date'),
+                subtitle: Text(
+                  _selectedStartDate != null
+                      ? _formatDate(_selectedStartDate!)
+                      : 'Select start date',
+                ),
+                leading: const Icon(Symbols.calendar_today),
+                trailing: const Icon(Symbols.arrow_drop_down),
+                onTap: _selectStartDate,
+                tileColor: Colors.grey[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: Colors.grey[300]!),
+                ),
+              ),
+              const SizedBox(height: 12),
+
               // Expiry Date Field
               ListTile(
                 title: const Text('Subscription Expiry Date'),
@@ -106,7 +127,7 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
                       ? _formatDate(_selectedExpiryDate!)
                       : 'Select expiry date',
                 ),
-                leading: const Icon(Symbols.calendar_today),
+                leading: const Icon(Symbols.event),
                 trailing: const Icon(Symbols.arrow_drop_down),
                 onTap: _selectExpiryDate,
                 tileColor: Colors.grey[50],
@@ -115,11 +136,11 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
                   side: BorderSide(color: Colors.grey[300]!),
                 ),
               ),
-              if (_selectedExpiryDate == null)
+              if (_selectedStartDate == null || _selectedExpiryDate == null)
                 const Padding(
                   padding: EdgeInsets.only(top: 8, left: 12),
                   child: Text(
-                    'Please select an expiry date',
+                    'Please select both start and expiry dates',
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 12,
@@ -143,6 +164,21 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
     );
   }
 
+  Future<void> _selectStartDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedStartDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+    );
+
+    if (picked != null && picked != _selectedStartDate) {
+      setState(() {
+        _selectedStartDate = picked;
+      });
+    }
+  }
+
   Future<void> _selectExpiryDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -163,10 +199,20 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
       return;
     }
 
-    if (_selectedExpiryDate == null) {
+    if (_selectedStartDate == null || _selectedExpiryDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please select an expiry date'),
+          content: Text('Please select both start and expiry dates'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_selectedStartDate!.isAfter(_selectedExpiryDate!)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Start date cannot be after expiry date'),
           backgroundColor: Colors.red,
         ),
       );
@@ -175,7 +221,8 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
 
     widget.onSave(
       _phoneController.text,
-      _selectedExpiryDate!,
+      _selectedStartDate,
+      _selectedExpiryDate,
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member.dart';
 import '../services/firebase_service.dart';
+import '../services/auth_service.dart';
 import '../widgets/activate_member_dialog.dart';
 
 class PendingDevicesScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class PendingDevicesScreen extends StatefulWidget {
 
 class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
   final FirebaseService _firebaseService = FirebaseService();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -129,12 +131,15 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
     builder: (context) => ActivateMemberDialog(
       device: device,
       onActivate: (phoneNumber, secondString, startDate, expiryDate) async {
+        final currentUser = _authService.currentUser;
         final success = await _firebaseService.activateMember(
           memberDocId: device.memberDocId!,
           phoneNumber: phoneNumber,
           subscriptionStartDate: startDate,
           subscriptionExpiryDate: expiryDate,
-          memberName: secondString
+          memberName: secondString,
+          performedBy: currentUser?.displayName ?? 'admin',
+          performedByEmail: currentUser?.email,
         );
 
         if (success) {

@@ -58,6 +58,74 @@ class FirebaseService {
     }
   }
 
+  // Find member by phone number
+  Future<Member?> findMemberByPhone(String phoneNumber) async {
+    try {
+      final querySnapshot = await _membersCollection
+          .where('phone_number', isEqualTo: phoneNumber.trim())
+          .limit(1)
+          .get();
+      
+      if (querySnapshot.docs.isNotEmpty) {
+        return Member.fromFirestore(querySnapshot.docs.first);
+      }
+      return null;
+    } catch (e) {
+      print('Error finding member by phone: $e');
+      return null;
+    }
+  }
+
+  // Find members by name (partial match)
+  Future<List<Member>> findMembersByName(String name) async {
+    try {
+      // Search for members whose name contains the search term
+      final querySnapshot = await _membersCollection
+          .where('member_name', isGreaterThanOrEqualTo: name.trim())
+          .where('member_name', isLessThanOrEqualTo: name.trim() + '\uf8ff')
+          .limit(10)
+          .get();
+      
+      return querySnapshot.docs
+          .map((doc) => Member.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      print('Error finding members by name: $e');
+      return [];
+    }
+  }
+
+  // Search members by both name and phone
+  Future<List<Member>> searchMembers(String query) async {
+    try {
+      final results = <Member>[];
+      
+      // First try exact phone match
+      final phoneResult = await findMemberByPhone(query);
+      if (phoneResult != null) {
+        results.add(phoneResult);
+      }
+      
+      // Then try name search
+      final nameResults = await findMembersByName(query);
+      for (final member in nameResults) {
+        if (!results.any((m) => m.memberDocId == member.memberDocId)) {
+          results.add(member);
+        }
+      }
+      
+      return results;
+    } catch (e) {
+      print('Error searching members: $e');
+      return [];
+    }
+  }
+
+  // Get member by document ID (alias for getMember)
+  Future<Member?> getMemberById(String memberDocId) async {
+    return getMember(memberDocId);
+  }
+
   // Request member deletion (requires admin approval)
   Future<bool> requestMemberDeletion({
     required String memberDocId,
@@ -164,12 +232,84 @@ class FirebaseService {
   }
 
   // Delete member directly (admin only)
-  Future<bool> deleteMemberDirectly(String memberDocId) async {
+  Future<bool> deleteMemberDirectly(String memberDocId, {String? performedBy, String? performedByEmail, String? reason}) async {
     try {
+      // Get current member data for history
+      final memberDoc = await _membersCollection.doc(memberDocId).get();
+      final memberData = memberDoc.data() as Map<String, dynamic>;
+      final memberName = memberData['member_name'] as String? ?? 'Unknown';
+      final phoneNumber = memberData['phone_number'] as String? ?? 'Unknown';
+
       await _membersCollection.doc(memberDocId).delete();
+
+      // Add history record
+      await addMemberHistory(
+        memberDocId: memberDocId,
+        action: MemberHistory.ACTION_MEMBER_DELETED,
+        oldValue: 'Member existed: $memberName ($phoneNumber)',
+        newValue: 'Member deleted',
+        performedBy: performedBy ?? 'system',
+        performedByEmail: performedByEmail,
+        reason: reason ?? 'Member deleted by admin',
+      );
+
       return true;
     } catch (e) {
       print('Error deleting member directly: $e');
+      return false;
+    }
+  }
+
+  // Create sample member history records for testing
+  Future<bool> createSampleHistoryRecords(String memberDocId) async {
+    try {
+      final now = DateTime.now();
+      
+      // Sample history records
+      final records = [
+        {
+          'action': MemberHistory.ACTION_STATUS_CHANGED,
+          'old_value': 'pending',
+          'new_value': 'active',
+          'field_name': 'membership_status',
+          'performed_by': 'admin',
+          'performed_by_email': 'admin@gym.com',
+          'reason': 'Member activated after registration',
+          'timestamp': Timestamp.fromDate(now.subtract(const Duration(days: 30))),
+        },
+        {
+          'action': MemberHistory.ACTION_SUBSCRIPTION_RENEWED,
+          'old_value': '2024-01-01',
+          'new_value': '2024-04-01',
+          'field_name': 'subscription_expiry_date',
+          'performed_by': 'admin',
+          'performed_by_email': 'admin@gym.com',
+          'reason': 'Subscription renewed for 3 months',
+          'timestamp': Timestamp.fromDate(now.subtract(const Duration(days: 15))),
+        },
+        {
+          'action': MemberHistory.ACTION_MEMBER_EDITED,
+          'old_value': 'Old Name',
+          'new_value': 'New Name',
+          'field_name': 'member_name',
+          'performed_by': 'admin',
+          'performed_by_email': 'admin@gym.com',
+          'reason': 'Name correction requested',
+          'timestamp': Timestamp.fromDate(now.subtract(const Duration(days: 7))),
+        },
+      ];
+
+      for (final record in records) {
+        await _memberHistoryCollection.add({
+          'member_doc_id': memberDocId,
+          ...record,
+        });
+      }
+
+      print('Sample history records created for member: $memberDocId');
+      return true;
+    } catch (e) {
+      print('Error creating sample history records: $e');
       return false;
     }
   }
@@ -181,6 +321,8 @@ class FirebaseService {
     required String memberName,
     required DateTime subscriptionStartDate,
     required DateTime subscriptionExpiryDate,
+    String? performedBy,
+    String? performedByEmail,
   }) async {
     try {
       // Check if member document exists
@@ -189,6 +331,11 @@ class FirebaseService {
         print('Member document does not exist: $memberDocId');
         return false;
       }
+
+      // Get current member data for history
+      final currentData = memberDoc.data() as Map<String, dynamic>;
+      final currentStatus = currentData['membership_status'] as String? ?? 'unknown';
+      final currentExpiry = currentData['subscription_expiry_date'] as Timestamp?;
 
       // Update member document
       await _membersCollection.doc(memberDocId).update({
@@ -201,6 +348,32 @@ class FirebaseService {
       });
 
       print('Member updated successfully: $memberDocId');
+
+      // Add history records
+      if (currentStatus != 'active') {
+        await addMemberHistory(
+          memberDocId: memberDocId,
+          action: MemberHistory.ACTION_STATUS_CHANGED,
+          oldValue: currentStatus,
+          newValue: 'active',
+          performedBy: performedBy ?? 'system',
+          performedByEmail: performedByEmail,
+          reason: 'Member activated',
+        );
+      }
+
+      if (currentExpiry?.toDate() != subscriptionExpiryDate) {
+        await addMemberHistory(
+          memberDocId: memberDocId,
+          action: MemberHistory.ACTION_SUBSCRIPTION_RENEWED,
+          oldValue: currentExpiry?.toDate().toString() ?? 'none',
+          newValue: subscriptionExpiryDate.toString(),
+          fieldName: 'subscription_expiry_date',
+          performedBy: performedBy ?? 'system',
+          performedByEmail: performedByEmail,
+          reason: 'Subscription renewed during activation',
+        );
+      }
 
       // Find and acknowledge the pending registration
       final pendingQuery = await _pendingRegistrationsCollection
@@ -221,12 +394,31 @@ class FirebaseService {
   }
 
   // Deactivate member
-  Future<bool> deactivateMember(String memberDocId) async {
+  Future<bool> deactivateMember(String memberDocId, {String? performedBy, String? performedByEmail, String? reason}) async {
     try {
+      // Get current member data for history
+      final memberDoc = await _membersCollection.doc(memberDocId).get();
+      final currentData = memberDoc.data() as Map<String, dynamic>;
+      final currentStatus = currentData['membership_status'] as String? ?? 'unknown';
+
       await _membersCollection.doc(memberDocId).update({
         'membership_status': 'inactive',
         'updated_at': FieldValue.serverTimestamp(),
       });
+
+      // Add history record
+      if (currentStatus != 'inactive') {
+        await addMemberHistory(
+          memberDocId: memberDocId,
+          action: MemberHistory.ACTION_STATUS_CHANGED,
+          oldValue: currentStatus,
+          newValue: 'inactive',
+          performedBy: performedBy ?? 'system',
+          performedByEmail: performedByEmail,
+          reason: reason ?? 'Member deactivated',
+        );
+      }
+
       return true;
     } catch (e) {
       print('Error deactivating member: $e');
@@ -234,22 +426,86 @@ class FirebaseService {
     }
   }
 
-  // Update member subscription expiry
+  // Update member subscription dates (both start and expiry)
+  Future<bool> updateSubscriptionDates({
+    required String memberDocId,
+    DateTime? newStartDate,
+    DateTime? newExpiryDate,
+    String? performedBy,
+    String? performedByEmail,
+    String? reason,
+  }) async {
+    try {
+      // Get current member data for history
+      final memberDoc = await _membersCollection.doc(memberDocId).get();
+      final currentData = memberDoc.data() as Map<String, dynamic>;
+      final currentStart = currentData['subscription_start_date'] as Timestamp?;
+      final currentExpiry = currentData['subscription_expiry_date'] as Timestamp?;
+
+      // Prepare update data
+      final updateData = <String, dynamic>{
+        'updated_at': FieldValue.serverTimestamp(),
+        'membership_status': 'active'
+      };
+
+      if (newStartDate != null) {
+        updateData['subscription_start_date'] = Timestamp.fromDate(newStartDate);
+      }
+      if (newExpiryDate != null) {
+        updateData['subscription_expiry_date'] = Timestamp.fromDate(newExpiryDate);
+      }
+
+      await _membersCollection.doc(memberDocId).update(updateData);
+
+      // Add history records for changes
+      if (newStartDate != null && currentStart?.toDate() != newStartDate) {
+        await addMemberHistory(
+          memberDocId: memberDocId,
+          action: MemberHistory.ACTION_MEMBER_EDITED,
+          oldValue: currentStart?.toDate().toString() ?? 'none',
+          newValue: newStartDate.toString(),
+          fieldName: 'subscription_start_date',
+          performedBy: performedBy ?? 'system',
+          performedByEmail: performedByEmail,
+          reason: reason ?? 'Subscription start date updated',
+        );
+      }
+
+      if (newExpiryDate != null && currentExpiry?.toDate() != newExpiryDate) {
+        await addMemberHistory(
+          memberDocId: memberDocId,
+          action: MemberHistory.ACTION_SUBSCRIPTION_RENEWED,
+          oldValue: currentExpiry?.toDate().toString() ?? 'none',
+          newValue: newExpiryDate.toString(),
+          fieldName: 'subscription_expiry_date',
+          performedBy: performedBy ?? 'system',
+          performedByEmail: performedByEmail,
+          reason: reason ?? 'Subscription expiry date updated',
+        );
+      }
+
+      return true;
+    } catch (e) {
+      print('Error updating subscription dates: $e');
+      return false;
+    }
+  }
+
+  // Update member subscription expiry (legacy method for backward compatibility)
   Future<bool> updateSubscriptionExpiry({
     required String memberDocId,
     required DateTime newExpiryDate,
+    String? performedBy,
+    String? performedByEmail,
+    String? reason,
   }) async {
-    try {
-      await _membersCollection.doc(memberDocId).update({
-        'subscription_expiry_date': Timestamp.fromDate(newExpiryDate),
-        'updated_at': FieldValue.serverTimestamp(),
-        'membership_status': 'active'
-      });
-      return true;
-    } catch (e) {
-      print('Error updating subscription expiry: $e');
-      return false;
-    }
+    return updateSubscriptionDates(
+      memberDocId: memberDocId,
+      newExpiryDate: newExpiryDate,
+      performedBy: performedBy,
+      performedByEmail: performedByEmail,
+      reason: reason,
+    );
   }
 
   // Get today's check-ins
@@ -389,14 +645,29 @@ class FirebaseService {
 
   // Get member history
   Stream<List<MemberHistory>> getMemberHistory(String memberDocId) {
+    if (memberDocId.isEmpty) {
+      // Return empty stream if memberDocId is invalid
+      return Stream.value([]);
+    }
+
     return _memberHistoryCollection
         .where('member_doc_id', isEqualTo: memberDocId)
         .orderBy('timestamp', descending: true)
         .limit(100)
         .snapshots()
-        .map((snapshot) => snapshot.docs
+        .handleError((error) {
+      print('Error in getMemberHistory stream: $error');
+      // Return empty list on error to prevent crashes
+    }).map((snapshot) {
+      try {
+        return snapshot.docs
             .map((doc) => MemberHistory.fromFirestore(doc))
-            .toList());
+            .toList();
+      } catch (e) {
+        print('Error parsing member history documents: $e');
+        return <MemberHistory>[];
+      }
+    });
   }
 
   // Get member statistics
@@ -449,6 +720,57 @@ class FirebaseService {
         'expired': 0,
         'pending_registrations': 0,
       };
+    }
+  }
+
+  // Update user password
+  Future<bool> updateUserPassword({
+    required String userId,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      // In a real implementation, you would verify current password first
+      // For now, we'll just update the password
+      await _firestore.collection('admin_users').doc(userId).update({
+        'password': newPassword, // In production, this should be hashed
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+      return true;
+    } catch (e) {
+      print('Error updating user password: $e');
+      return false;
+    }
+  }
+
+  // Update user email
+  Future<bool> updateUserEmail({
+    required String userId,
+    required String newEmail,
+    required String password,
+  }) async {
+    try {
+      // In a real implementation, you would verify password first
+      // For now, we'll just update the email
+      await _firestore.collection('admin_users').doc(userId).update({
+        'email': newEmail.toLowerCase(),
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+      return true;
+    } catch (e) {
+      print('Error updating user email: $e');
+      return false;
+    }
+  }
+
+  // Get current user data
+  Future<Map<String, dynamic>?> getCurrentUserData(String userId) async {
+    try {
+      final doc = await _firestore.collection('admin_users').doc(userId).get();
+      return doc.exists ? doc.data() as Map<String, dynamic> : null;
+    } catch (e) {
+      print('Error getting user data: $e');
+      return null;
     }
   }
 

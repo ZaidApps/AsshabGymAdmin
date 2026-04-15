@@ -405,20 +405,61 @@ class MemberCard extends StatelessWidget {
       context: context,
       builder: (context) => EditMemberDialog(
         member: member,
-        onSave: (phoneNumber, expiryDate) async {
-          // Note: updateMemberInfo method doesn't exist in FirebaseService
-          // This would need to be implemented or use existing methods
-          final success = true; // Placeholder
-          
+        onSave: (phoneNumber, startDate, expiryDate) async {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  success ? 'Member updated successfully' : 'Failed to update member',
+            // Show loading indicator
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const AlertDialog(
+                content: Row(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 20),
+                    Text('Updating member...'),
+                  ],
                 ),
-                backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
               ),
             );
+
+            try {
+              final currentUser = _authService.currentUser;
+              final success = await _firebaseService.updateSubscriptionDates(
+                memberDocId: member.memberDocId!,
+                newStartDate: startDate,
+                newExpiryDate: expiryDate,
+                performedBy: currentUser?.displayName ?? 'admin',
+                performedByEmail: currentUser?.email,
+                reason: 'Updated subscription dates via edit dialog',
+              );
+
+              Navigator.pop(context); // Remove loading dialog
+              Navigator.pop(context); // Close edit dialog
+
+              if (success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Member subscription updated successfully'),
+                    backgroundColor: AppTheme.successColor,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Failed to update member subscription'),
+                    backgroundColor: AppTheme.errorColor,
+                  ),
+                );
+              }
+            } catch (e) {
+              Navigator.pop(context); // Remove loading dialog
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error updating member: $e'),
+                  backgroundColor: AppTheme.errorColor,
+                ),
+              );
+            }
           }
         },
       ),
@@ -455,14 +496,22 @@ class MemberCard extends StatelessWidget {
               Navigator.pop(context);
               // Note: updateMemberStatus method doesn't exist in FirebaseService
               // Use activateMember or deactivateMember instead
+              final currentUser = _authService.currentUser;
               final success = member.isActive 
-                ? await _firebaseService.deactivateMember(member.memberDocId!)
+                ? await _firebaseService.deactivateMember(
+                    member.memberDocId!,
+                    performedBy: currentUser?.displayName ?? 'admin',
+                    performedByEmail: currentUser?.email,
+                    reason: 'Member deactivated via admin panel',
+                  )
                 : await _firebaseService.activateMember(
                     memberDocId: member.memberDocId!,
                     phoneNumber: member.phoneNumber ?? '',
                     memberName: member.memberName ?? '',
                     subscriptionStartDate: member.subscriptionStartDate?.toDate() ?? DateTime.now(),
                     subscriptionExpiryDate: member.subscriptionExpiryDate?.toDate() ?? DateTime.now(),
+                    performedBy: currentUser?.displayName ?? 'admin',
+                    performedByEmail: currentUser?.email,
                   );
               
               if (context.mounted) {
@@ -497,7 +546,13 @@ class MemberCard extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              final success = await _firebaseService.deleteMemberDirectly(member.memberDocId!);
+              final currentUser = _authService.currentUser;
+              final success = await _firebaseService.deleteMemberDirectly(
+                member.memberDocId!,
+                performedBy: currentUser?.displayName ?? 'admin',
+                performedByEmail: currentUser?.email,
+                reason: 'Member deleted via admin panel',
+              );
               
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
