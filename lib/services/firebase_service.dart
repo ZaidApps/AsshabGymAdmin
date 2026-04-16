@@ -321,6 +321,7 @@ class FirebaseService {
     required String memberName,
     required DateTime subscriptionStartDate,
     required DateTime subscriptionExpiryDate,
+    required double subscriptionAmount,
     String? performedBy,
     String? performedByEmail,
   }) async {
@@ -344,6 +345,7 @@ class FirebaseService {
         'member_name': memberName,
         'subscription_start_date': Timestamp.fromDate(subscriptionStartDate),
         'subscription_expiry_date': Timestamp.fromDate(subscriptionExpiryDate),
+        'subscription_amount': subscriptionAmount,
         'updated_at': FieldValue.serverTimestamp(),
       });
 
@@ -431,6 +433,7 @@ class FirebaseService {
     required String memberDocId,
     DateTime? newStartDate,
     DateTime? newExpiryDate,
+    double? newSubscriptionAmount,
     String? performedBy,
     String? performedByEmail,
     String? reason,
@@ -441,6 +444,7 @@ class FirebaseService {
       final currentData = memberDoc.data() as Map<String, dynamic>;
       final currentStart = currentData['subscription_start_date'] as Timestamp?;
       final currentExpiry = currentData['subscription_expiry_date'] as Timestamp?;
+      final currentAmount = currentData['subscription_amount'] as double?;
 
       // Prepare update data
       final updateData = <String, dynamic>{
@@ -453,6 +457,9 @@ class FirebaseService {
       }
       if (newExpiryDate != null) {
         updateData['subscription_expiry_date'] = Timestamp.fromDate(newExpiryDate);
+      }
+      if (newSubscriptionAmount != null) {
+        updateData['subscription_amount'] = newSubscriptionAmount;
       }
 
       await _membersCollection.doc(memberDocId).update(updateData);
@@ -481,6 +488,19 @@ class FirebaseService {
           performedBy: performedBy ?? 'system',
           performedByEmail: performedByEmail,
           reason: reason ?? 'Subscription expiry date updated',
+        );
+      }
+
+      if (newSubscriptionAmount != null && currentAmount != newSubscriptionAmount) {
+        await addMemberHistory(
+          memberDocId: memberDocId,
+          action: MemberHistory.ACTION_MEMBER_EDITED,
+          oldValue: currentAmount?.toString() ?? 'none',
+          newValue: newSubscriptionAmount.toString(),
+          fieldName: 'subscription_amount',
+          performedBy: performedBy ?? 'system',
+          performedByEmail: performedByEmail,
+          reason: reason ?? 'Subscription amount updated',
         );
       }
 

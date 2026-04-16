@@ -1,33 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member.dart';
+import '../theme/app_theme.dart';
 
-class ActivateMemberDialog extends StatefulWidget {
-  final PendingDeviceRegistration device;
-  final Function(String phoneNumber, String memberName, DateTime startDate, DateTime expiryDate, double subscriptionAmount) onActivate;
+class RenewSubscriptionDialog extends StatefulWidget {
+  final Member member;
+  final Function(DateTime startDate, DateTime expiryDate, double amount) onRenew;
 
-  const ActivateMemberDialog({
+  const RenewSubscriptionDialog({
     super.key,
-    required this.device,
-    required this.onActivate,
+    required this.member,
+    required this.onRenew,
   });
 
   @override
-  State<ActivateMemberDialog> createState() => _ActivateMemberDialogState();
+  State<RenewSubscriptionDialog> createState() => _RenewSubscriptionDialogState();
 }
 
-class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
+class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
-  final _nameController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedStartDate;
   DateTime? _selectedExpiryDate;
 
   @override
+  void initState() {
+    super.initState();
+    _selectedStartDate = widget.member.subscriptionStartDate?.toDate();
+    _selectedExpiryDate = widget.member.subscriptionExpiryDate?.toDate();
+    _amountController.text = widget.member.subscriptionAmount?.toString() ?? '';
+  }
+
+  @override
   void dispose() {
-    _phoneController.dispose();
-    _nameController.dispose();
     _amountController.dispose();
     super.dispose();
   }
@@ -37,9 +42,19 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
     return AlertDialog(
       title: Row(
         children: [
-          const Icon(Symbols.person_add, color: Colors.green),
-          const SizedBox(width: 8),
-          const Text('Activate Member'),
+          Icon(
+            Symbols.refresh,
+            color: AppTheme.primaryColor,
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            'Renew Subscription',
+            style: AppTheme.heading3.copyWith(
+              color: AppTheme.onSurfaceColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
       content: SingleChildScrollView(
@@ -49,7 +64,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Device Information
+              // Current Info
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -60,87 +75,37 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Device Information',
+                      'Current Subscription',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[700],
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text('Device ID: ${widget.device.deviceId ?? "Unknown"}'),
-                    Text('Platform: ${widget.device.platform.toUpperCase()}'),
-                    if (widget.device.createdAt != null)
-                      Text('Registered: ${_formatDate(widget.device.createdAt!.toDate())}'),
+                    Text('Member: ${widget.member.memberName ?? widget.member.phoneNumber}'),
+                    Text('Current Amount: ${widget.member.subscriptionAmount ?? 0}'),
+                    if (widget.member.subscriptionStartDate != null)
+                      Text('Start Date: ${_formatDate(widget.member.subscriptionStartDate!.toDate())}'),
+                    if (widget.member.subscriptionExpiryDate != null)
+                      Text('Expiry Date: ${_formatDate(widget.member.subscriptionExpiryDate!.toDate())}'),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
 
-              // Member Name Field
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Member Name',
-                  hintText: 'Enter member name',
-                  prefixIcon: Icon(Symbols.person),
-                  border: OutlineInputBorder(),
+              // New Subscription Fields
+              Text(
+                'New Subscription Details',
+                style: AppTheme.heading3.copyWith(
+                  color: AppTheme.onSurfaceColor,
+                  fontWeight: FontWeight.w600,
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter member name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Phone Number Field
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  hintText: 'Enter member phone number',
-                  prefixIcon: Icon(Symbols.phone),
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a phone number';
-                  }
-                  if (!RegExp(r'^[0-9]{10,15}$').hasMatch(value)) {
-                    return 'Please enter a valid phone number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Subscription Amount Field
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Subscription Amount',
-                  hintText: 'Enter subscription amount paid',
-                  prefixIcon: Icon(Symbols.currency_exchange),
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter subscription amount';
-                  }
-                  if (double.tryParse(value) == null || double.tryParse(value)! <= 0) {
-                    return 'Please enter a valid amount';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
 
               // Start Date Field
               ListTile(
-                title: const Text('Subscription Start Date'),
+                title: const Text('New Start Date'),
                 subtitle: Text(
                   _selectedStartDate != null
                       ? _formatDate(_selectedStartDate!)
@@ -155,22 +120,11 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                   side: BorderSide(color: Colors.grey[300]!),
                 ),
               ),
-              if (_selectedStartDate == null)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8, left: 12),
-                  child: Text(
-                    'Please select a start date',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Expiry Date Field
               ListTile(
-                title: const Text('Subscription Expiry Date'),
+                title: const Text('New Expiry Date'),
                 subtitle: Text(
                   _selectedExpiryDate != null
                       ? _formatDate(_selectedExpiryDate!)
@@ -185,17 +139,28 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                   side: BorderSide(color: Colors.grey[300]!),
                 ),
               ),
-              if (_selectedExpiryDate == null)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8, left: 12),
-                  child: Text(
-                    'Please select an expiry date',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 12,
-                    ),
-                  ),
+              const SizedBox(height: 12),
+
+              // Amount Field
+              TextFormField(
+                controller: _amountController,
+                decoration: const InputDecoration(
+                  labelText: 'New Subscription Amount',
+                  hintText: 'Enter amount paid',
+                  prefixIcon: Icon(Symbols.currency_exchange),
+                  border: OutlineInputBorder(),
                 ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter subscription amount';
+                  }
+                  if (double.tryParse(value) == null || double.tryParse(value)! <= 0) {
+                    return 'Please enter a valid amount';
+                  }
+                  return null;
+                },
+              ),
             ],
           ),
         ),
@@ -206,12 +171,12 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: _activateMember,
+          onPressed: _renewSubscription,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.primaryColor,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Activate Member'),
+          child: const Text('Renew Subscription'),
         ),
       ],
     );
@@ -220,7 +185,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
   Future<void> _selectStartDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedStartDate ?? DateTime.now(),
       firstDate: DateTime.now().subtract(const Duration(days: 30)),
       lastDate: DateTime.now().add(const Duration(days: 30)),
     );
@@ -235,7 +200,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
   Future<void> _selectExpiryDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedStartDate?.add(const Duration(days: 30)) ?? DateTime.now().add(const Duration(days: 30)),
+      initialDate: _selectedExpiryDate ?? _selectedStartDate?.add(const Duration(days: 30)) ?? DateTime.now().add(const Duration(days: 30)),
       firstDate: _selectedStartDate ?? DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
     );
@@ -246,8 +211,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
       });
     }
   }
-
-  void _activateMember() {
+  void _renewSubscription() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -293,14 +257,47 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
       return;
     }
 
-    widget.onActivate(
-      _phoneController.text,
-      _nameController.text.isNotEmpty ? _nameController.text : _phoneController.text,
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    // Call the renewal callback and wait for result
+    final success = await widget.onRenew(
       _selectedStartDate!,
       _selectedExpiryDate!,
       subscriptionAmount,
     );
-    Navigator.pop(context);
+
+    // Close loading dialog
+    if (mounted) {
+      Navigator.pop(context); // Close loading dialog
+
+      if (success) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Subscription renewed successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Close the renewal dialog
+        Navigator.pop(context);
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to renew subscription'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   String _formatDate(DateTime date) {

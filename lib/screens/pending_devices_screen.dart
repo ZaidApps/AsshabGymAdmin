@@ -126,44 +126,40 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
   }
 
   void _showActivateMemberDialog(PendingDeviceRegistration device) {
-  showDialog(
-    context: context,
-    builder: (context) => ActivateMemberDialog(
-      device: device,
-      onActivate: (phoneNumber, secondString, startDate, expiryDate) async {
-        final currentUser = _authService.currentUser;
-        final success = await _firebaseService.activateMember(
-          memberDocId: device.memberDocId!,
-          phoneNumber: phoneNumber,
-          subscriptionStartDate: startDate,
-          subscriptionExpiryDate: expiryDate,
-          memberName: secondString,
-          performedBy: currentUser?.displayName ?? 'admin',
-          performedByEmail: currentUser?.email,
-        );
-
-        if (success) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Member activated successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.of(context).pop();
+    showDialog(
+      context: context,
+      builder: (context) => ActivateMemberDialog(
+        device: device,
+        onActivate: (phoneNumber, memberName, startDate, expiryDate, subscriptionAmount) async {
+          if (await _firebaseService.activateMember(
+            memberDocId: device.memberDocId!,
+            phoneNumber: phoneNumber,
+            memberName: memberName,
+            subscriptionStartDate: startDate,
+            subscriptionExpiryDate: expiryDate,
+            subscriptionAmount: subscriptionAmount,
+          )) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Member activated successfully!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              Navigator.of(context).pop();
+            }
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to activate member'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Failed to activate member'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      },
-    ),
-  );
-}
+        },
+      ),
+    );
+  }
 }

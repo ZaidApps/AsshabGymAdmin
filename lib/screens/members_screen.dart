@@ -6,6 +6,7 @@ import '../services/firebase_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/edit_member_dialog.dart';
+import '../widgets/renew_subscription_dialog.dart';
 
 class MembersScreen extends StatefulWidget {
   const MembersScreen({super.key});
@@ -333,6 +334,11 @@ class MemberCard extends StatelessWidget {
                         value: 'delete',
                         child: const Text('Delete Member'),
                       ),
+                    if (_authService.isAdmin)
+                      PopupMenuItem(
+                        value: 'renew',
+                        child: const Text('Renew Subscription'),
+                      ),
                   ],
                 ),
               ],
@@ -510,6 +516,7 @@ class MemberCard extends StatelessWidget {
                     memberName: member.memberName ?? '',
                     subscriptionStartDate: member.subscriptionStartDate?.toDate() ?? DateTime.now(),
                     subscriptionExpiryDate: member.subscriptionExpiryDate?.toDate() ?? DateTime.now(),
+                    subscriptionAmount: member.subscriptionAmount ?? 0.0,
                     performedBy: currentUser?.displayName ?? 'admin',
                     performedByEmail: currentUser?.email,
                   );
@@ -576,6 +583,43 @@ class MemberCard extends StatelessWidget {
     );
   }
 
+  void _showRenewDialog(BuildContext context, Member member) {
+    showDialog(
+      context: context,
+      builder: (context) => RenewSubscriptionDialog(
+        member: member,
+        onRenew: (startDate, expiryDate, amount) async {
+          Navigator.pop(context); // Close dialog first
+          
+          final currentUser = _authService.currentUser;
+          final success = await _firebaseService.updateSubscriptionDates(
+            memberDocId: member.memberDocId!,
+            newStartDate: startDate,
+            newExpiryDate: expiryDate,
+            newSubscriptionAmount: amount,
+            performedBy: currentUser?.displayName ?? 'admin',
+            performedByEmail: currentUser?.email,
+            reason: 'Subscription renewed via admin panel',
+          );
+
+          // Use Future.microtask to ensure success message shows after dialog is dismissed
+          Future.microtask(() {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    success ? 'Subscription renewed successfully' : 'Failed to renew subscription',
+                  ),
+                  backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
+                ),
+              );
+            }
+          });
+        },
+      ),
+    );
+  }
+
   void _handleAction(String action, BuildContext context, Member member) {
     switch (action) {
       case 'activate':
@@ -586,6 +630,9 @@ class MemberCard extends StatelessWidget {
         break;
       case 'delete':
         _showDeleteDialog(context, member);
+        break;
+      case 'renew':
+        _showRenewDialog(context, member);
         break;
     }
   }

@@ -8,6 +8,7 @@ class Member {
   final String membershipStatus;
   final Timestamp? subscriptionStartDate;
   final Timestamp? subscriptionExpiryDate;
+  final double? subscriptionAmount;
   final Timestamp? createdAt;
   final Timestamp? updatedAt;
 
@@ -19,6 +20,7 @@ class Member {
     required this.membershipStatus,
     this.subscriptionStartDate,
     this.subscriptionExpiryDate,
+    this.subscriptionAmount,
     this.createdAt,
     this.updatedAt,
   });
@@ -33,6 +35,7 @@ class Member {
       membershipStatus: data['membership_status'] ?? 'pending',
       subscriptionStartDate: data['subscription_start_date'],
       subscriptionExpiryDate: data['subscription_expiry_date'],
+      subscriptionAmount: data['subscription_amount']?.toDouble(),
       createdAt: data['created_at'],
       updatedAt: data['updated_at'],
     );
@@ -47,8 +50,9 @@ class Member {
       'membership_status': membershipStatus,
       'subscription_start_date': subscriptionStartDate,
       'subscription_expiry_date': subscriptionExpiryDate,
+      'subscription_amount': subscriptionAmount,
       'created_at': createdAt ?? FieldValue.serverTimestamp(),
-      'updated_at': FieldValue.serverTimestamp(),
+      'updated_at': updatedAt ?? FieldValue.serverTimestamp(),
     };
   }
 
