@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="asshab_gym_web_admin"
+        android:label="Ashhab Gym"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
