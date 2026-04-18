@@ -3,6 +3,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'admin_dashboard.dart';
+import '../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -68,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                       const SizedBox(height: 24),
                       Text(
-                        'Gym Admin',
+                        AppLocalizations.of(context).appTitle,
                         style: AppTheme.heading2.copyWith(
                           color: AppTheme.onSurfaceColor,
                           fontWeight: FontWeight.w700,
@@ -76,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Welcome back! Please login to continue',
+                        AppLocalizations.of(context).welcomeMessage,
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.onBackgroundColor,
                         ),
@@ -84,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 32),
                       Text(
-                        'Sign in to manage your gym',
+                        AppLocalizations.of(context).signInToManageGym,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.grey[600],
                         ),
@@ -94,18 +95,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Email Field
                       TextFormField(
                         controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'Enter your email',
-                          prefixIcon: Icon(Symbols.email, color: AppTheme.onBackgroundColor),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context).email,
+                          hintText: AppLocalizations.of(context).enterYourEmail,
+                          prefixIcon: const Icon(Symbols.email, color: AppTheme.onBackgroundColor),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
+                            return AppLocalizations.of(context).pleaseEnterYourEmail;
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                            return 'Please enter a valid email';
+                          if (!RegExp(r'^[\w-]+@[\w-]+\.[\w-]{2,4}$').hasMatch(value)) {
+                            return AppLocalizations.of(context).pleaseEnterAValidEmail;
                           }
                           return null;
                         },
@@ -117,8 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter your password',
+                          labelText: AppLocalizations.of(context).password,
+                          hintText: AppLocalizations.of(context).enterYourPassword,
                           prefixIcon: const Icon(Symbols.lock, color: AppTheme.onBackgroundColor),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -134,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
+                            return AppLocalizations.of(context).pleaseEnterYourPassword;
                           }
                           return null;
                         },
@@ -166,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 )
                               : Text(
-                                  'Sign In',
+                                  AppLocalizations.of(context).loginButton,
                                   style: AppTheme.bodyLarge.copyWith(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600,
@@ -250,8 +251,8 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Invalid email or password'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context).invalidEmailOrPassword),
               backgroundColor: Colors.red,
             ),
           );
@@ -261,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: $e'),
+            content: Text('${AppLocalizations.of(context).loginFailed}: $e'),
             backgroundColor: Colors.red,
           ),
         );

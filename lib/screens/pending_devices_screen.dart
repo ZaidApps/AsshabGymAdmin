@@ -4,6 +4,7 @@ import '../models/member.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/activate_member_dialog.dart';
+import '../l10n/app_localizations.dart';
 
 class PendingDevicesScreen extends StatefulWidget {
   const PendingDevicesScreen({super.key});
@@ -20,7 +21,7 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pending Device Registrations'),
+        title: Text(AppLocalizations.of(context).pendingDevices),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: StreamBuilder<List<PendingDeviceRegistration>>(
@@ -39,7 +40,7 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
           final pendingDevices = snapshot.data ?? [];
 
           if (pendingDevices.isEmpty) {
-            return const Center(
+            return  Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -50,7 +51,7 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'No pending device registrations',
+                    AppLocalizations.of(context).noPendingDevicesFound,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
@@ -58,7 +59,7 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'New device registrations will appear here',
+                    AppLocalizations.of(context).newDeviceRegistrationsWillAppearHere,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 
 class RenewSubscriptionDialog extends StatefulWidget {
   final Member member;
@@ -49,7 +50,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
           ),
           const SizedBox(width: 12),
           Text(
-            'Renew Subscription',
+            AppLocalizations.of(context).renewSubscription,
             style: AppTheme.heading3.copyWith(
               color: AppTheme.onSurfaceColor,
               fontWeight: FontWeight.w600,
@@ -75,19 +76,19 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Current Subscription',
+                      AppLocalizations.of(context).currentSubscription,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[700],
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text('Member: ${widget.member.memberName ?? widget.member.phoneNumber}'),
-                    Text('Current Amount: ${widget.member.subscriptionAmount ?? 0}'),
+                    Text('${AppLocalizations.of(context).member}: ${widget.member.memberName ?? widget.member.phoneNumber}'),
+                    Text('${AppLocalizations.of(context).currentAmount}: ${widget.member.subscriptionAmount ?? 0}'),
                     if (widget.member.subscriptionStartDate != null)
-                      Text('Start Date: ${_formatDate(widget.member.subscriptionStartDate!.toDate())}'),
+                      Text('${AppLocalizations.of(context).startDate}: ${_formatDate(widget.member.subscriptionStartDate!.toDate())}'),
                     if (widget.member.subscriptionExpiryDate != null)
-                      Text('Expiry Date: ${_formatDate(widget.member.subscriptionExpiryDate!.toDate())}'),
+                      Text('${AppLocalizations.of(context).expiryDate}: ${_formatDate(widget.member.subscriptionExpiryDate!.toDate())}'),
                   ],
                 ),
               ),
@@ -95,7 +96,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
 
               // New Subscription Fields
               Text(
-                'New Subscription Details',
+                AppLocalizations.of(context).newSubscriptionDetails,
                 style: AppTheme.heading3.copyWith(
                   color: AppTheme.onSurfaceColor,
                   fontWeight: FontWeight.w600,
@@ -105,11 +106,11 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
 
               // Start Date Field
               ListTile(
-                title: const Text('New Start Date'),
+                title: Text(AppLocalizations.of(context).newStartDate),
                 subtitle: Text(
                   _selectedStartDate != null
                       ? _formatDate(_selectedStartDate!)
-                      : 'Select start date',
+                      : AppLocalizations.of(context).selectStartDate,
                 ),
                 leading: const Icon(Symbols.calendar_month),
                 trailing: const Icon(Symbols.arrow_drop_down),
@@ -124,11 +125,11 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
 
               // Expiry Date Field
               ListTile(
-                title: const Text('New Expiry Date'),
+                title: Text(AppLocalizations.of(context).newExpiryDate),
                 subtitle: Text(
                   _selectedExpiryDate != null
                       ? _formatDate(_selectedExpiryDate!)
-                      : 'Select expiry date',
+                      : AppLocalizations.of(context).selectExpiryDate,
                 ),
                 leading: const Icon(Symbols.calendar_today),
                 trailing: const Icon(Symbols.arrow_drop_down),
@@ -144,19 +145,19 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
               // Amount Field
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'New Subscription Amount',
-                  hintText: 'Enter amount paid',
-                  prefixIcon: Icon(Symbols.currency_exchange),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).subscriptionAmount,
+                  hintText: AppLocalizations.of(context).enterAmountPaid,
+                  prefixIcon: const Icon(Symbols.currency_exchange),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter subscription amount';
+                    return AppLocalizations.of(context).pleaseEnterSubscriptionAmount;
                   }
                   if (double.tryParse(value) == null || double.tryParse(value)! <= 0) {
-                    return 'Please enter a valid amount';
+                    return AppLocalizations.of(context).pleaseEnterAValidAmount;
                   }
                   return null;
                 },
@@ -168,7 +169,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context).cancel),
         ),
         ElevatedButton(
           onPressed: _renewSubscription,
@@ -176,7 +177,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
             backgroundColor: AppTheme.primaryColor,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Renew Subscription'),
+          child: Text(AppLocalizations.of(context).renewSubscription),
         ),
       ],
     );
@@ -218,8 +219,8 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
 
     if (_selectedStartDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a start date'),
+         SnackBar(
+          content: Text(AppLocalizations.of(context).pleaseSelectAStartDate),
           backgroundColor: Colors.red,
         ),
       );
@@ -228,8 +229,8 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
 
     if (_selectedExpiryDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select an expiry date'),
+         SnackBar(
+          content: Text(AppLocalizations.of(context).pleaseSelectAnExpiryDate),
           backgroundColor: Colors.red,
         ),
       );
@@ -238,8 +239,8 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
 
     if (_selectedExpiryDate!.isBefore(_selectedStartDate!)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Expiry date must be after start date'),
+         SnackBar(
+          content: Text(AppLocalizations.of(context).expiryDateMustBeAfterStartDate),
           backgroundColor: Colors.red,
         ),
       );
@@ -249,8 +250,8 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
     final subscriptionAmount = double.tryParse(_amountController.text) ?? 0.0;
     if (subscriptionAmount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid subscription amount'),
+         SnackBar(
+          content: Text(AppLocalizations.of(context).pleaseEnterAValidSubscriptionAmount),
           backgroundColor: Colors.red,
         ),
       );
@@ -280,8 +281,8 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
       if (success) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Subscription renewed successfully!'),
+           SnackBar(
+            content: Text(AppLocalizations.of(context).subscriptionRenewedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
@@ -291,8 +292,8 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
       } else {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to renew subscription'),
+           SnackBar(
+            content: Text(AppLocalizations.of(context).failedToRenewSubscription),
             backgroundColor: Colors.red,
           ),
         );

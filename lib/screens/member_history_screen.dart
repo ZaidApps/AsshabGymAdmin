@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member_history.dart';
 import '../services/firebase_service.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 
 class MemberHistoryScreen extends StatefulWidget {
   final String memberDocId;
@@ -45,7 +46,7 @@ class _MemberHistoryScreenState extends State<MemberHistoryScreen> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error loading member data: $e'),
+            content: Text(AppLocalizations.of(context).errorLoadingMember.replaceAll('{error}', e.toString())),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -66,7 +67,7 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(width: 12),
           Text(
-            'Member History',
+            AppLocalizations.of(context).memberDetails,
             style: AppTheme.heading2.copyWith(
               color: AppTheme.onSurfaceColor,
               fontWeight: FontWeight.w600,
@@ -93,12 +94,12 @@ Widget build(BuildContext context) {
               });
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'all', child: Text('All Actions')),
-              const PopupMenuItem(value: 'status', child: Text('Status Changes')),
-              const PopupMenuItem(value: 'edit', child: Text('Member Edits')),
-              const PopupMenuItem(value: 'subscription', child: Text('Subscription')),
-              const PopupMenuItem(value: 'device', child: Text('Device Changes')),
-              const PopupMenuItem(value: 'delete', child: Text('Deletions')),
+              PopupMenuItem(value: 'all', child: Text(AppLocalizations.of(context).allActions)),
+              PopupMenuItem(value: 'status', child: Text(AppLocalizations.of(context).statusChanged)),
+              PopupMenuItem(value: 'edit', child: Text(AppLocalizations.of(context).memberEdited)),
+              PopupMenuItem(value: 'subscription', child: Text(AppLocalizations.of(context).subscriptionRenewed)),
+              PopupMenuItem(value: 'device', child: Text(AppLocalizations.of(context).deviceAdded)),
+              PopupMenuItem(value: 'delete', child: Text(AppLocalizations.of(context).memberDeleted)),
             ],
           ),
         ),
@@ -138,7 +139,7 @@ Widget build(BuildContext context) {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Loading...',
+                            AppLocalizations.of(context).loading,
                             style: AppTheme.heading2.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -146,7 +147,7 @@ Widget build(BuildContext context) {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Fetching member information',
+                            AppLocalizations.of(context).fetchingMemberInformation,
                             style: AppTheme.bodyMedium.copyWith(
                               color: Colors.white.withValues(alpha: 0.9),
                             ),
@@ -174,7 +175,7 @@ Widget build(BuildContext context) {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _member!.memberName ?? 'Unknown Member',
+                                _member!.memberName ?? AppLocalizations.of(context).unknownMember,
                                 style: AppTheme.heading2.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -184,7 +185,7 @@ Widget build(BuildContext context) {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _member!.phoneNumber ?? 'No phone number',
+                                _member!.phoneNumber ?? AppLocalizations.of(context).noPhoneNumber,
                                 style: AppTheme.bodyMedium.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
                                 ),
@@ -225,7 +226,7 @@ Widget build(BuildContext context) {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Member Not Found',
+                                AppLocalizations.of(context).memberNotFound,
                                 style: AppTheme.heading2.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -233,7 +234,7 @@ Widget build(BuildContext context) {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Unable to load member information',
+                                AppLocalizations.of(context).unableToLoadMemberInformation,
                                 style: AppTheme.bodyMedium.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
                                 ),
@@ -266,14 +267,14 @@ Widget build(BuildContext context) {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Error loading history',
+                        AppLocalizations.of(context).errorLoadingHistory,
                         style: AppTheme.bodyLarge.copyWith(
                           color: AppTheme.errorColor,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Please try again later',
+                        AppLocalizations.of(context).pleaseTryAgainLater,
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.onBackgroundColor,
                         ),
@@ -316,14 +317,14 @@ Widget build(BuildContext context) {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'No history found',
+                        AppLocalizations.of(context).noHistoryFound,
                         style: AppTheme.bodyLarge.copyWith(
                           color: AppTheme.onBackgroundColor,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'No actions recorded for this member yet',
+                        AppLocalizations.of(context).noActionsRecordedForThisMemberYet,
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.onBackgroundColor,
                         ),
@@ -364,15 +365,15 @@ Widget build(BuildContext context) {
     final success = await _firebaseService.createSampleHistoryRecords(widget.memberDocId);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sample history records created successfully!'),
+         SnackBar(
+          content: Text(AppLocalizations.of(context).sampleHistoryRecordsCreatedSuccessfully),
           backgroundColor: AppTheme.successColor,
         ),
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to create sample data'),
+         SnackBar(
+          content: Text(AppLocalizations.of(context).failedToCreateSampleData),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -381,7 +382,7 @@ Widget build(BuildContext context) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: $e'),
+          content: Text(AppLocalizations.of(context).errorCreatingUser.replaceAll('{error}', e.toString())),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -476,7 +477,7 @@ class HistoryTimelineItem extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _getActionTitle(history.action),
+                          _getActionTitle(context, history.action),
                           style: AppTheme.bodyMedium.copyWith(
                             fontWeight: FontWeight.w600,
                             color: _getActionColor(history.action),
@@ -489,16 +490,16 @@ class HistoryTimelineItem extends StatelessWidget {
                   const SizedBox(height: 8),
                   
                   // Details
-                  _buildDetailRow('Performed By', history.performedBy, Symbols.person),
+                  _buildDetailRow(_getActionTitle(context, history.action), history.performedBy, Symbols.person),
                   if (history.performedByEmail != null)
-                    _buildDetailRow('Email', history.performedByEmail!, Symbols.email),
+                    _buildDetailRow(_getActionTitle(context, history.action), history.performedByEmail!, Symbols.email),
                   if (history.fieldName != null)
-                    _buildDetailRow('Field', history.fieldName!, Symbols.data_object),
-                  _buildDetailRow('Old Value', history.oldValue, Icons.arrow_back),
-                  _buildDetailRow('New Value', history.newValue, Icons.arrow_forward),
+                    _buildDetailRow(_getActionTitle(context, history.action), history.fieldName!, Symbols.data_object),
+                  _buildDetailRow(_getActionTitle(context, history.action), history.oldValue, Icons.arrow_back),
+                  _buildDetailRow(_getActionTitle(context, history.action), history.newValue, Icons.arrow_forward),
                   if (history.reason != null && history.reason!.isNotEmpty)
-                    _buildDetailRow('Reason', history.reason!, Icons.description),
-                  _buildDetailRow('Date/Time', _formatDate(history.timestamp.toDate()), Icons.schedule),
+                    _buildDetailRow(_getActionTitle(context, history.action), history.reason!, Icons.description),
+                  _buildDetailRow(_getActionTitle(context, history.action), _formatDate(history.timestamp.toDate()), Icons.schedule),
                 ],
               ),
             ),
@@ -575,24 +576,24 @@ class HistoryTimelineItem extends StatelessWidget {
     }
   }
 
-  String _getActionTitle(String action) {
+  String _getActionTitle(BuildContext context, String action) {
     switch (action) {
       case MemberHistory.ACTION_STATUS_CHANGED:
-        return 'Status Changed';
+        return AppLocalizations.of(context).statusChanged;
       case MemberHistory.ACTION_MEMBER_EDITED:
-        return 'Member Edited';
+        return AppLocalizations.of(context).memberEdited;
       case MemberHistory.ACTION_SUBSCRIPTION_RENEWED:
-        return 'Subscription Renewed';
+        return AppLocalizations.of(context).subscriptionRenewed;
       case MemberHistory.ACTION_SUBSCRIPTION_EXPIRED:
-        return 'Subscription Expired';
+        return AppLocalizations.of(context).subscriptionExpired;
       case MemberHistory.ACTION_DEVICE_ADDED:
-        return 'Device Added';
+        return AppLocalizations.of(context).deviceAdded;
       case MemberHistory.ACTION_DEVICE_REMOVED:
-        return 'Device Removed';
+        return AppLocalizations.of(context).deviceRemoved;
       case MemberHistory.ACTION_MEMBER_DELETED:
-        return 'Member Deleted';
+        return AppLocalizations.of(context).memberDeleted;
       default:
-        return 'Unknown Action';
+        return AppLocalizations.of(context).unknownAction;
     }
   }
 

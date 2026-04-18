@@ -7,6 +7,7 @@ import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/edit_member_dialog.dart';
 import '../widgets/renew_subscription_dialog.dart';
+import '../l10n/app_localizations.dart';
 
 class MembersScreen extends StatefulWidget {
   const MembersScreen({super.key});
@@ -34,7 +35,7 @@ class _MembersScreenState extends State<MembersScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              'Members',
+              AppLocalizations.of(context).members,
               style: AppTheme.heading2.copyWith(
                 color: AppTheme.onSurfaceColor,
                 fontWeight: FontWeight.w600,
@@ -61,9 +62,9 @@ class _MembersScreenState extends State<MembersScreen> {
                 });
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(value: 'all', child: Text('All Members')),
-                const PopupMenuItem(value: 'active', child: Text('Active Only')),
-                const PopupMenuItem(value: 'pending', child: Text('Pending Only')),
+                PopupMenuItem(value: 'all', child: Text(AppLocalizations.of(context).allMembers)),
+                PopupMenuItem(value: 'active', child: Text(AppLocalizations.of(context).activeOnly)),
+                PopupMenuItem(value: 'pending', child: Text(AppLocalizations.of(context).pendingOnly)),
               ],
             ),
           ),
@@ -88,7 +89,7 @@ class _MembersScreenState extends State<MembersScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Error loading members',
+                    AppLocalizations.of(context).errorLoadingMembers,
                     style: AppTheme.bodyLarge.copyWith(
                       color: AppTheme.errorColor,
                     ),
@@ -130,14 +131,14 @@ class _MembersScreenState extends State<MembersScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'No members found',
+                    AppLocalizations.of(context).noMembersFound,
                     style: AppTheme.bodyLarge.copyWith(
                       color: AppTheme.onBackgroundColor,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Try adjusting your filters or check back later',
+                    AppLocalizations.of(context).tryAdjustingYourFiltersOrCheckBackLater,
                     style: AppTheme.bodyMedium.copyWith(
                       color: AppTheme.onBackgroundColor,
                     ),
@@ -203,7 +204,7 @@ class MemberCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -219,7 +220,7 @@ class MemberCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: CircleAvatar(
-                    radius: 24,
+                    radius: 20,
                     backgroundColor: member.isActive ? AppTheme.successColor : 
                                    member.isPending ? AppTheme.warningColor : 
                                    AppTheme.errorColor,
@@ -228,11 +229,11 @@ class MemberCard extends StatelessWidget {
                              member.isPending ? Symbols.person_alert : 
                              Symbols.person_off,
                       color: Colors.white,
-                      size: 24,
+                      size: 20,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,17 +246,17 @@ class MemberCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: member.isActive ? AppTheme.successColor.withOpacity(0.1) : 
                                      member.isPending ? AppTheme.warningColor.withOpacity(0.1) : 
                                      AppTheme.errorColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          member.isActive ? 'Active' : member.isPending ? 'Pending' : 'Inactive',
+                          member.isActive ? AppLocalizations.of(context).active : member.isPending ? AppLocalizations.of(context).pending : AppLocalizations.of(context).inactive,
                           style: AppTheme.bodySmall.copyWith(
                             color: member.isActive ? AppTheme.successColor : 
                                        member.isPending ? AppTheme.warningColor : 
@@ -270,22 +271,22 @@ class MemberCard extends StatelessWidget {
               ],
             ),
             
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             
             // Details Section
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDetailRow('Device ID', member.deviceId ?? 'Unknown', Symbols.devices),
-                _buildDetailRow('Phone', member.phoneNumber ?? 'Unknown', Symbols.phone),
+                _buildDetailRow(AppLocalizations.of(context).deviceId, member.deviceId ?? 'Unknown', Symbols.devices),
+                _buildDetailRow(AppLocalizations.of(context).phoneNumber, member.phoneNumber ?? 'Unknown', Symbols.phone),
                 if (member.subscriptionStartDate != null)
-                  _buildDetailRow('Start Date', _formatDate(member.subscriptionStartDate!.toDate()), Icons.calendar_today),
+                  _buildDetailRow(AppLocalizations.of(context).subscriptionStartDate, _formatDate(member.subscriptionStartDate!.toDate()), Icons.calendar_today),
                 if (member.subscriptionExpiryDate != null)
-                  _buildDetailRow('Expiry Date', _formatDate(member.subscriptionExpiryDate!.toDate()), Icons.event),
+                  _buildDetailRow(AppLocalizations.of(context).subscriptionExpiryDate, _formatDate(member.subscriptionExpiryDate!.toDate()), Icons.event),
               ],
             ),
             
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             
             // Actions Section
             Row(
@@ -293,51 +294,51 @@ class MemberCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => _showMemberDetails(context, member),
-                    icon: const Icon(Symbols.info, size: 18),
-                    label: const Text('View Details'),
+                    icon: const Icon(Symbols.info, size: 16),
+                    label: Text(AppLocalizations.of(context).viewDetails),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () => _showEditDialog(context, member),
-                    icon: const Icon(Symbols.edit, size: 18),
-                    label: const Text('Edit'),
+                    icon: const Icon(Symbols.edit, size: 16),
+                    label: Text(AppLocalizations.of(context).edit),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 PopupMenuButton<String>(
-                  icon: const Icon(Symbols.more_vert, size: 18),
+                  icon: const Icon(Symbols.more_vert, size: 16),
                   onSelected: (value) => _handleAction(value, context, member),
                   itemBuilder: (context) => [
                     if (_authService.isAdmin)
                       PopupMenuItem(
                         value: 'deactivate',
-                        child: Text(member.isActive ? 'Deactivate' : 'Activate'),
+                        child: Text(member.isActive ? AppLocalizations.of(context).deactivate : AppLocalizations.of(context).activate),
                       ),
                     if (_authService.isAdmin)
                       PopupMenuItem(
                         value: 'delete',
-                        child: const Text('Delete Member'),
+                        child: Text(AppLocalizations.of(context).deleteMember),
                       ),
                     if (_authService.isAdmin)
                       PopupMenuItem(
                         value: 'renew',
-                        child: const Text('Renew Subscription'),
+                        child: Text(AppLocalizations.of(context).renewSubscription),
                       ),
                   ],
                 ),
@@ -378,28 +379,28 @@ class MemberCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Member Details'),
+        title: Text(AppLocalizations.of(context).memberDetails),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Name', member.memberName ?? 'Unknown', Symbols.person),
-              _buildDetailRow('Phone', member.phoneNumber ?? 'Unknown', Symbols.phone),
-              _buildDetailRow('Device ID', member.deviceId ?? 'Unknown', Symbols.devices),
-              _buildDetailRow('Status', member.isActive ? 'Active' : member.isPending ? 'Pending' : 'Inactive', 
+              _buildDetailRow(AppLocalizations.of(context).name, member.memberName ?? AppLocalizations.of(context).unknownMember, Symbols.person),
+              _buildDetailRow(AppLocalizations.of(context).phoneNumber, member.phoneNumber ?? AppLocalizations.of(context).unknownMember, Symbols.phone),
+              _buildDetailRow(AppLocalizations.of(context).deviceId, member.deviceId ?? AppLocalizations.of(context).unknownMember, Symbols.devices),
+              _buildDetailRow(AppLocalizations.of(context).status, member.isActive ? AppLocalizations.of(context).active : member.isPending ? AppLocalizations.of(context).pending : AppLocalizations.of(context).inactive, 
                            member.isActive ? Symbols.check_circle : member.isPending ? Symbols.pending : Symbols.cancel),
               if (member.subscriptionStartDate != null)
-                _buildDetailRow('Start Date', _formatDate(member.subscriptionStartDate!.toDate()), Icons.calendar_today),
+                _buildDetailRow(AppLocalizations.of(context).startDate, _formatDate(member.subscriptionStartDate!.toDate()), Icons.calendar_today),
               if (member.subscriptionExpiryDate != null)
-                _buildDetailRow('Expiry Date', _formatDate(member.subscriptionExpiryDate!.toDate()), Icons.event),
+                _buildDetailRow(AppLocalizations.of(context).expiryDate, _formatDate(member.subscriptionExpiryDate!.toDate()), Icons.event),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context).close),
           ),
         ],
       ),
@@ -417,12 +418,12 @@ class MemberCard extends StatelessWidget {
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (context) => const AlertDialog(
+              builder: (context) =>  AlertDialog(
                 content: Row(
                   children: [
                     CircularProgressIndicator(),
                     SizedBox(width: 20),
-                    Text('Updating member...'),
+                    Text(AppLocalizations.of(context).updatingMember),
                   ],
                 ),
               ),
@@ -444,15 +445,15 @@ class MemberCard extends StatelessWidget {
 
               if (success) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Member subscription updated successfully'),
+                   SnackBar(
+                    content: Text(AppLocalizations.of(context).memberSubscriptionUpdatedSuccessfully),
                     backgroundColor: AppTheme.successColor,
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Failed to update member subscription'),
+                   SnackBar(
+                    content: Text(AppLocalizations.of(context).failedToUpdateMemberSubscription),
                     backgroundColor: AppTheme.errorColor,
                   ),
                 );
@@ -461,7 +462,7 @@ class MemberCard extends StatelessWidget {
               Navigator.pop(context); // Remove loading dialog
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Error updating member: $e'),
+                  content: Text(AppLocalizations.of(context).errorUpdatingMember.replaceAll('{error}', e.toString())),
                   backgroundColor: AppTheme.errorColor,
                 ),
               );
@@ -476,16 +477,16 @@ class MemberCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(member.isActive ? 'Deactivate Member' : 'Activate Member'),
+        title: Text(member.isActive ? AppLocalizations.of(context).deactivateMember : AppLocalizations.of(context).activateMember),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Are you sure you want to ${member.isActive ? 'deactivate' : 'activate'} this member?'),
+            Text(AppLocalizations.of(context).areYouSureYouWantToDeactivateActivateMember.replaceAll('{action}', member.isActive ? 'deactivate' : 'activate')),
             const SizedBox(height: 16),
             TextField(
               controller: TextEditingController(),
-              decoration: const InputDecoration(
-                labelText: 'Reason (optional)',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).reasonOptional,
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -495,7 +496,7 @@ class MemberCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -525,14 +526,14 @@ class MemberCard extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      success ? 'Member ${member.isActive ? 'deactivated' : 'activated'} successfully' : 'Failed to update member',
+                      success ? (member.isActive ? AppLocalizations.of(context).memberDeactivatedSuccessfully : AppLocalizations.of(context).memberActivatedSuccessfully) : AppLocalizations.of(context).failedToUpdateMember,
                     ),
                     backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
                   ),
                 );
               }
             },
-            child: Text(member.isActive ? 'Deactivate' : 'Activate'),
+            child: Text(member.isActive ? AppLocalizations.of(context).deactivate : AppLocalizations.of(context).activate),
           ),
         ],
       ),
@@ -543,12 +544,12 @@ class MemberCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Member'),
-        content: Text('Are you sure you want to delete ${member.memberName ?? member.phoneNumber ?? 'this member'}? This action cannot be undone.'),
+        title: Text(AppLocalizations.of(context).deleteMember),
+        content: Text(AppLocalizations.of(context).areYouSureYouWantToDeleteMember.replaceAll('{name}', member.memberName ?? member.phoneNumber ?? AppLocalizations.of(context).member)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -565,7 +566,7 @@ class MemberCard extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      success ? 'Member deleted successfully' : 'Failed to delete member',
+                      success ? AppLocalizations.of(context).memberDeletedSuccessfully : AppLocalizations.of(context).failedToDeleteMember,
                     ),
                     backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
                   ),
@@ -576,7 +577,7 @@ class MemberCard extends StatelessWidget {
               backgroundColor: AppTheme.errorColor,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context).delete),
           ),
         ],
       ),
@@ -608,7 +609,7 @@ class MemberCard extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    success ? 'Subscription renewed successfully' : 'Failed to renew subscription',
+                    success ? AppLocalizations.of(context).subscriptionRenewedSuccessfully : AppLocalizations.of(context).failedToRenewSubscription,
                   ),
                   backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
                 ),

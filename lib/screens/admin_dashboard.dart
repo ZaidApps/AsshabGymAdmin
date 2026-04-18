@@ -14,6 +14,8 @@ import 'member_history_screen.dart';
 import 'user_profile_screen.dart';
 import 'user_management_screen.dart';
 import 'pending_devices_screen.dart';
+import '../widgets/language_switcher.dart';
+import '../l10n/app_localizations.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -31,6 +33,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        toolbarHeight: 80,
         title: Row(
           children: [
             Icon(
@@ -43,7 +46,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Dashboard',
+                  AppLocalizations.of(context).dashboard,
                   style: AppTheme.heading2.copyWith(
                     color: AppTheme.onSurfaceColor,
                     fontWeight: FontWeight.w600,
@@ -59,6 +62,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         style: AppTheme.bodySmall.copyWith(
                           color: AppTheme.onSurfaceColor.withOpacity(0.7),
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       );
                     }
                     return const SizedBox.shrink();
@@ -76,8 +81,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               color: AppTheme.onSurfaceColor,
               size: 20,
             ),
-            tooltip: 'Refresh Dashboard',
+            tooltip: AppLocalizations.of(context).refreshDashboard,
           ),
+          const LanguageSwitcher(),
           PopupMenuButton<String>(
             icon: Icon(
               Symbols.more_vert,
@@ -86,13 +92,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
             onSelected: _handleMenuAction,
             itemBuilder: (context) => [
-              const PopupMenuItem(
+               PopupMenuItem(
                 value: 'logout',
                 child: Row(
                   children: [
                     Icon(Symbols.logout, size: 16),
                     SizedBox(width: 8),
-                    Text('Logout'),
+                    Text(AppLocalizations.of(context).logout),
                   ],
                 ),
               ),
@@ -123,7 +129,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back!',
+                    AppLocalizations.of(context).welcomeBack,
                     style: AppTheme.heading1.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -131,7 +137,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Here\'s what\'s happening at your gym today',
+                    AppLocalizations.of(context).gymTodayMessage,
                     style: AppTheme.bodyLarge.copyWith(
                       color: Colors.white.withOpacity(0.9),
                     ),
@@ -176,12 +182,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           mainAxisSpacing: 12,
                           childAspectRatio: 1.0,
                           children: [
-                            _buildStatCard('Total Members', stats['total'].toString(), AppTheme.primaryColor, Symbols.people),
-                            _buildStatCard('Active Members', stats['active'].toString(), AppTheme.successColor, Symbols.person_check),
-                            _buildStatCard('Inactive Members', stats['inactive'].toString(), Colors.grey, Symbols.person_off),
-                            _buildStatCard('Expired Members', stats['expired'].toString(), AppTheme.errorColor, Icons.event_busy),
-                            _buildStatCard('Today\'s Check-ins', todayCheckins.toString(), AppTheme.accentColor, Symbols.check_circle),
-                            _buildStatCard('Pending Requests', stats['pending'].toString(), AppTheme.warningColor, Symbols.pending_actions),
+                            _buildStatCard(AppLocalizations.of(context).members, stats['total'].toString(), AppTheme.primaryColor, Symbols.people),
+                            _buildStatCard(AppLocalizations.of(context).activeMembers, stats['active'].toString(), AppTheme.successColor, Symbols.person_check),
+                            _buildStatCard(AppLocalizations.of(context).inactiveMembers, stats['inactive'].toString(), Colors.grey, Symbols.person_off),
+                            _buildStatCard(AppLocalizations.of(context).expiredMembers, stats['expired'].toString(), AppTheme.errorColor, Icons.event_busy),
+                            _buildStatCard(AppLocalizations.of(context).todaysCheckins, todayCheckins.toString(), AppTheme.accentColor, Symbols.check_circle),
+                            _buildStatCard(AppLocalizations.of(context).pendingDevices, stats['pending'].toString(), AppTheme.warningColor, Symbols.pending_actions),
                           ],
                         );
                       },
@@ -195,7 +201,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             
             // Quick Actions
             Text(
-              'Quick Actions',
+              AppLocalizations.of(context).quickActions,
               style: AppTheme.heading3.copyWith(
                 color: AppTheme.onSurfaceColor,
                 fontWeight: FontWeight.w600,
@@ -217,50 +223,50 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   childAspectRatio: 1.4,
                   children: [
                     _buildActionCard(
-                      'Members',
-                      'Manage gym members',
+                      AppLocalizations.of(context).members,
+                      AppLocalizations.of(context).manageGymMembers,
                       Symbols.people,
                       AppTheme.primaryColor,
                       () => _navigateTo(const MembersScreen()),
                     ),
                     _buildActionCard(
-                      'Check-ins',
-                      'View check-in history',
+                      AppLocalizations.of(context).checkins,
+                      AppLocalizations.of(context).viewCheckinHistory,
                       Symbols.check_circle,
                       AppTheme.successColor,
                       () => _navigateTo(const CheckinsScreen()),
                     ),
                     _buildActionCard(
-                      'Expired Check-ins',
-                      'View expired check-in attempts',
+                      AppLocalizations.of(context).expiredCheckins,
+                      AppLocalizations.of(context).viewExpiredCheckins,
                       Symbols.warning,
                       AppTheme.errorColor,
                       () => _navigateTo(const ExpiredCheckinsScreen()),
                     ),
                     _buildActionCard(
-                      'User Management',
-                      'Manage admin users',
+                      AppLocalizations.of(context).userManagement,
+                      AppLocalizations.of(context).manageAdminUsers,
                       Symbols.admin_panel_settings,
                       AppTheme.accentColor,
                       () => _navigateTo(const UserManagementScreen()),
                     ),
                     _buildActionCard(
-                      'Member History',
-                      'View member activity history',
+                      AppLocalizations.of(context).memberHistory,
+                      AppLocalizations.of(context).viewMemberActivity,
                       Symbols.history,
                       Colors.purple,
                       () => _showMemberHistorySelector(),
                     ),
                     _buildActionCard(
-                      'User Profile',
-                      'Manage your account settings',
+                      AppLocalizations.of(context).userProfile,
+                      AppLocalizations.of(context).manageAccountSettings,
                       Symbols.person,
                       AppTheme.secondaryColor,
                       () => _navigateTo(const UserProfileScreen()),
                     ),
                     _buildActionCard(
-                      'Pending Devices',
-                      'Review device requests',
+                      AppLocalizations.of(context).pendingDevices,
+                      AppLocalizations.of(context).viewPendingDevices,
                       Symbols.devices,
                       AppTheme.warningColor,
                       () => _navigateTo(const PendingDevicesScreen()),

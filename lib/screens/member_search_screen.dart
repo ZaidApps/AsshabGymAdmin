@@ -4,6 +4,7 @@ import '../models/member.dart';
 import '../services/firebase_service.dart';
 import '../theme/app_theme.dart';
 import 'member_history_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class MemberSearchScreen extends StatefulWidget {
   const MemberSearchScreen({super.key});
@@ -40,7 +41,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              'Find Member',
+              AppLocalizations.of(context).members,
               style: AppTheme.heading2.copyWith(
                 color: AppTheme.onSurfaceColor,
                 fontWeight: FontWeight.w600,
@@ -74,7 +75,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Search Member',
+                      AppLocalizations.of(context).searchMember,
                       style: AppTheme.heading3.copyWith(
                         color: AppTheme.onSurfaceColor,
                         fontWeight: FontWeight.w600,
@@ -82,7 +83,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Enter member name or phone number to find member history',
+                      AppLocalizations.of(context).enterMemberNameOrPhoneToFindHistory,
                       style: AppTheme.bodyMedium.copyWith(
                         color: AppTheme.onBackgroundColor,
                       ),
@@ -91,8 +92,8 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                     TextFormField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        labelText: 'Search by Name or Phone',
-                        hintText: 'Enter member name or phone number',
+                        labelText: AppLocalizations.of(context).searchByNameOrPhone,
+                        hintText: AppLocalizations.of(context).enterMemberNameOrPhoneToFindHistory,
                         prefixIcon: const Icon(Symbols.search, color: AppTheme.onBackgroundColor),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
@@ -120,10 +121,10 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                       keyboardType: TextInputType.text,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter a name or phone number';
+                          return AppLocalizations.of(context).pleaseEnterNameOrPhone;
                         }
                         if (value.length < 2) {
-                          return 'Please enter at least 2 characters';
+                          return AppLocalizations.of(context).pleaseEnterAtLeast2Chars;
                         }
                         return null;
                       },
@@ -158,7 +159,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                                   const Icon(Symbols.search, size: 20),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Search Member',
+                                    AppLocalizations.of(context).searchMemberButton,
                                     style: AppTheme.bodyLarge.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
@@ -207,7 +208,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
             // Results Section
             if (_searchResults.isNotEmpty || _isLoading) ...[
               Text(
-                'Search Results',
+                AppLocalizations.of(context).searchResults,
                 style: AppTheme.heading3.copyWith(
                   color: AppTheme.onSurfaceColor,
                   fontWeight: FontWeight.w600,
@@ -256,12 +257,12 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
         });
       } else {
         setState(() {
-          _errorMessage = 'No member found with name or phone: $query';
+          _errorMessage = '${AppLocalizations.of(context).noMemberFound}: $query';
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error searching for member: $e';
+        _errorMessage = '${AppLocalizations.of(context).errorSearchingMember}: $e';
       });
     } finally {
       setState(() {
@@ -273,8 +274,8 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
   void _navigateToHistory(Member member) {
     if (member.memberDocId == null || member.memberDocId!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid member ID. Cannot view history.'),
+         SnackBar(
+          content: Text(AppLocalizations.of(context).invalidMemberId),
           backgroundColor: AppTheme.errorColor,
         ),
       );

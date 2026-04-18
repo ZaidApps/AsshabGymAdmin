@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import '../l10n/app_localizations.dart';
 import '../models/admin_user.dart';
 import '../services/auth_service.dart';
 
@@ -121,14 +122,14 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Approve User Deletion'),
+        title: Text(AppLocalizations.of(context).deleteMember),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('User: ${request.targetUserEmail}'),
             const SizedBox(height: 8),
-            const Text('This action cannot be undone.'),
+            Text('This action cannot be undone.'),
             if (request.reason != null) ...[
               const SizedBox(height: 8),
               Text('Reason: ${request.reason}'),
@@ -138,12 +139,12 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Approve Deletion'),
+            child: Text(AppLocalizations.of(context).confirm),
           ),
         ],
       ),
@@ -175,14 +176,14 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reject User Deletion'),
+        title: Text(AppLocalizations.of(context).deleteMember),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('User: ${request.targetUserEmail}'),
             const SizedBox(height: 8),
-            const Text('Please provide a reason for rejection:'),
+            Text('Please provide a reason for rejection:'),
             const SizedBox(height: 8),
             TextField(
               controller: _rejectionReasonController,
@@ -197,12 +198,12 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: const Text('Reject Request'),
+            child: Text(AppLocalizations.of(context).deleteMember),
           ),
         ],
       ),

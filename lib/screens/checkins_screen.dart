@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../services/firebase_service.dart';
 import '../models/member.dart';
+import '../l10n/app_localizations.dart';
 
 class CheckinsScreen extends StatefulWidget {
   const CheckinsScreen({super.key});
@@ -19,7 +20,7 @@ class _CheckinsScreenState extends State<CheckinsScreen> {
 Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
-      title: const Text('Check-ins'),
+      title: Text(AppLocalizations.of(context).checkins),
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       actions: [
         IconButton(
@@ -42,7 +43,7 @@ Widget build(BuildContext context) {
           child: TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              labelText: 'Search by name or phone',
+              labelText: AppLocalizations.of(context).searchByNameOrPhone,
               prefixIcon: const Icon(Symbols.search),
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
@@ -67,7 +68,7 @@ Widget build(BuildContext context) {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'Selected Date: ${_formatDate(_selectedDate!)}',
+                '${AppLocalizations.of(context).selectedDate}: ${_formatDate(_selectedDate!)}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryContainer,

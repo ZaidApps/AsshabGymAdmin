@@ -76,19 +76,22 @@ class FirebaseService {
     }
   }
 
-  // Find members by name (partial match)
+  // Find members by name (partial match, case-insensitive)
   Future<List<Member>> findMembersByName(String name) async {
     try {
-      // Search for members whose name contains the search term
-      final querySnapshot = await _membersCollection
-          .where('member_name', isGreaterThanOrEqualTo: name.trim())
-          .where('member_name', isLessThanOrEqualTo: name.trim() + '\uf8ff')
-          .limit(10)
-          .get();
-      
-      return querySnapshot.docs
+      // Fetch all members and filter client-side for case-insensitive search
+      final querySnapshot = await _membersCollection.limit(50).get();
+      final allMembers = querySnapshot.docs
           .map((doc) => Member.fromFirestore(doc))
           .toList();
+      
+      final searchName = name.trim().toLowerCase();
+      final filteredMembers = allMembers.where((member) {
+        final memberName = member.memberName?.toLowerCase() ?? '';
+        return memberName.contains(searchName);
+      }).take(10).toList();
+      
+      return filteredMembers;
     } catch (e) {
       print('Error finding members by name: $e');
       return [];

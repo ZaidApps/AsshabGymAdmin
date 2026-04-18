@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member.dart';
+import '../l10n/app_localizations.dart';
 
 class EditMemberDialog extends StatefulWidget {
   final Member member;
@@ -43,7 +44,7 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
         children: [
           const Icon(Symbols.edit, color: Colors.blue),
           const SizedBox(width: 8),
-          Text(widget.member.isActive ? 'Edit Member' : 'Set Subscription'),
+          Text(widget.member.isActive ? AppLocalizations.of(context).edit : 'Set Subscription'),
         ],
       ),
       content: SingleChildScrollView(
@@ -81,11 +82,11 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
               // Phone Number Field
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).phoneNumber,
                   hintText: 'Enter member phone number',
-                  prefixIcon: Icon(Symbols.phone),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Symbols.phone),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
                 validator: (value) {
@@ -102,7 +103,7 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
 
               // Start Date Field
               ListTile(
-                title: const Text('Subscription Start Date'),
+                title: Text(AppLocalizations.of(context).subscriptionStartDate),
                 subtitle: Text(
                   _selectedStartDate != null
                       ? _formatDate(_selectedStartDate!)
@@ -121,7 +122,7 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
 
               // Expiry Date Field
               ListTile(
-                title: const Text('Subscription Expiry Date'),
+                title: Text(AppLocalizations.of(context).subscriptionExpiryDate),
                 subtitle: Text(
                   _selectedExpiryDate != null
                       ? _formatDate(_selectedExpiryDate!)
@@ -154,11 +155,11 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context).cancel),
         ),
         ElevatedButton(
           onPressed: _saveMember,
-          child: const Text('Save'),
+          child: Text(AppLocalizations.of(context).ok),
         ),
       ],
     );

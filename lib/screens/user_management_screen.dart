@@ -4,6 +4,7 @@ import '../models/admin_user.dart';
 import '../services/auth_service.dart';
 import '../widgets/create_user_dialog.dart';
 import '../widgets/user_deletion_requests_dialog.dart';
+import '../l10n/app_localizations.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
@@ -34,7 +35,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Text('User Management'),
+            Text(AppLocalizations.of(context).settings),
             if (!isAdmin && currentUser != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -42,7 +43,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   color: Colors.orange,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
+                child: Text(
                   'Regular User',
                   style: TextStyle(
                     color: Colors.white,
@@ -60,14 +61,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             IconButton(
               onPressed: _showCreateUserDialog,
               icon: const Icon(Symbols.person_add),
-              tooltip: 'Create User',
+              tooltip: AppLocalizations.of(context).activateMember,
             ),
           // Always show deletion requests button
-          IconButton(
+         /* IconButton(
             onPressed: _showDeletionRequests,
             icon: const Icon(Symbols.approval),
-            tooltip: 'Deletion Requests',
-          ),
+            tooltip: AppLocalizations.of(context).deleteMember,
+          ),*/
         ],
       ),
       body: StreamBuilder<List<AdminUser>>(
@@ -86,7 +87,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           final users = snapshot.data ?? [];
 
           if (users.isEmpty) {
-            return const Center(
+            return  Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -97,7 +98,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'No users found',
+                    AppLocalizations.of(context).noMemberFound,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
@@ -222,22 +223,22 @@ class UserCard extends StatelessWidget {
                 itemBuilder: (context) => [
                   // Admin can delete users they created
                   if (canManageUser && user.isActive)
-                    const PopupMenuItem(value: 'delete', child: Text('Delete User')),
+                    PopupMenuItem(value: 'delete', child: Text(AppLocalizations.of(context).deleteUser)),
                   // Admin can deactivate users they created
                   if (canManageUser && user.isActive)
-                    const PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
+                    PopupMenuItem(value: 'deactivate', child: Text(AppLocalizations.of(context).deactivate)),
                   // Admin can reactivate users they deactivated
                   if (canManageUser && !user.isActive)
-                    const PopupMenuItem(value: 'activate', child: Text('Activate')),
+                    PopupMenuItem(value: 'activate', child: Text(AppLocalizations.of(context).active)),
                   // Super admin can manage all users (existing functionality)
                   if (_authService.isAdmin && !canManageUser && user.isActive)
                     PopupMenuItem(
                       value: 'deactivate',
-                      child: Text(user.isRegularUser ? 'Request Deletion' : 'Deactivate'),
+                      child: Text(user.isRegularUser ? AppLocalizations.of(context).requestDeletion : AppLocalizations.of(context).deactivate),
                     ),
                   if (_authService.isAdmin && !canManageUser && !user.isActive)
-                    const PopupMenuItem(value: 'activate', child: Text('Activate')),
-                  const PopupMenuItem(value: 'details', child: Text('View Details')),
+                    PopupMenuItem(value: 'activate', child: Text(AppLocalizations.of(context).active)),
+                  PopupMenuItem(value: 'details', child: Text(AppLocalizations.of(context).viewDetails)),
                 ],
               ),
       ),
@@ -265,17 +266,17 @@ class UserCard extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete User'),
-        content: Text('Are you sure you want to delete ${user.displayName} (${user.email})? This action cannot be undone and the user will not be able to login again.'),
+        title: Text(AppLocalizations.of(context).deleteUserTitle),
+        content: Text(AppLocalizations.of(context).deleteUserConfirmation.replaceAll('{name}', user.displayName).replaceAll('{email}', user.email)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context).delete),
           ),
         ],
       ),
@@ -287,7 +288,7 @@ class UserCard extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'User deleted successfully' : 'Failed to delete user'),
+            content: Text(success ? AppLocalizations.of(context).userDeletedSuccessfully : AppLocalizations.of(context).failedToDeleteUser),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
         );
@@ -301,7 +302,7 @@ class UserCard extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? 'User status updated' : 'Failed to update status'),
+          content: Text(success ? AppLocalizations.of(context).userStatusUpdated : AppLocalizations.of(context).failedToUpdateStatus),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
       );
@@ -370,29 +371,29 @@ class UserCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('User Details'),
+        title: Text(AppLocalizations.of(context).userDetails),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailRow('Name', user.displayName),
-              _buildDetailRow('Email', user.email),
-              _buildDetailRow('Role', user.role.name.toUpperCase()),
-              _buildDetailRow('Status', user.isActive ? 'Active' : 'Inactive'),
+              _buildDetailRow(AppLocalizations.of(context).memberName, user.displayName),
+              _buildDetailRow(AppLocalizations.of(context).email, user.email),
+              _buildDetailRow(AppLocalizations.of(context).role, user.role.name.toUpperCase()),
+              _buildDetailRow(AppLocalizations.of(context).status, user.isActive ? AppLocalizations.of(context).active : AppLocalizations.of(context).inactive),
               if (user.createdAt != null)
-                _buildDetailRow('Created At', _formatDate(user.createdAt!.toDate())),
+                _buildDetailRow(AppLocalizations.of(context).createdAt, _formatDate(user.createdAt!.toDate())),
               if (user.lastLoginAt != null)
-                _buildDetailRow('Last Login', _formatDate(user.lastLoginAt!.toDate())),
+                _buildDetailRow(AppLocalizations.of(context).lastLogin, _formatDate(user.lastLoginAt!.toDate())),
               if (user.createdBy != null)
-                _buildDetailRow('Created By', user.createdBy!),
+                _buildDetailRow(AppLocalizations.of(context).createdBy, user.createdBy!),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context).close),
           ),
         ],
       ),

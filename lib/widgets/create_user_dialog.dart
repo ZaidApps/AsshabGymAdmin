@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/admin_user.dart';
 import '../services/auth_service.dart';
+import '../l10n/app_localizations.dart';
 
 class CreateUserDialog extends StatefulWidget {
   final String createdBy;
@@ -38,7 +39,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
         children: [
           const Icon(Symbols.person_add, color: Colors.green),
           const SizedBox(width: 8),
-          const Text('Create New User'),
+          Text(AppLocalizations.of(context).createUser),
         ],
       ),
       content: SingleChildScrollView(
@@ -51,19 +52,19 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
               // Email Field
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter user email',
-                  prefixIcon: Icon(Symbols.email),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).email,
+                  hintText: AppLocalizations.of(context).enterUserEmail,
+                  prefixIcon: const Icon(Symbols.email),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter an email';
+                    return AppLocalizations.of(context).pleaseEnterAnEmail;
                   }
                   if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                    return 'Please enter a valid email';
+                    return AppLocalizations.of(context).pleaseEnterAValidEmail;
                   }
                   return null;
                 },
@@ -73,15 +74,15 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
               // Display Name Field
               TextFormField(
                 controller: _displayNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Display Name',
-                  hintText: 'Enter user display name',
-                  prefixIcon: Icon(Symbols.person),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).displayName,
+                  hintText: AppLocalizations.of(context).enterUserDisplayName,
+                  prefixIcon: const Icon(Symbols.person),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a display name';
+                    return AppLocalizations.of(context).pleaseEnterADisplayName;
                   }
                   return null;
                 },
@@ -92,17 +93,17 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'User Role',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).memberName,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 8),
                   RadioListTile<UserRole>(
-                    title: const Text('Regular User'),
-                    subtitle: const Text('Can manage gym members, needs approval for deletions'),
+                    title: Text(AppLocalizations.of(context).regularUser),
+                    subtitle: Text(AppLocalizations.of(context).memberDetails),
                     value: UserRole.user,
                     groupValue: _selectedRole,
                     onChanged: (value) {
@@ -113,8 +114,8 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                     activeColor: Colors.blue,
                   ),
                   RadioListTile<UserRole>(
-                    title: const Text('Admin'),
-                    subtitle: const Text('Full access to all features'),
+                    title: Text(AppLocalizations.of(context).admin),
+                    subtitle: Text(AppLocalizations.of(context).viewDetails),
                     value: UserRole.admin,
                     groupValue: _selectedRole,
                     onChanged: (value) {
@@ -140,7 +141,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Default Password',
+                      AppLocalizations.of(context).defaultPassword,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.blue.shade700,
@@ -148,7 +149,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Password will be: ${_emailController.text.split('@')[0]}123',
+                      AppLocalizations.of(context).passwordWillBe.replaceAll('{password}', '${_emailController.text.split('@')[0]}123'),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blue.shade600,
@@ -156,7 +157,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'User can change password after first login',
+                      AppLocalizations.of(context).userCanChangePasswordAfterFirstLogin,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blue.shade600,
@@ -172,7 +173,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
       actions: [
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context).cancel),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _createUser,
@@ -182,7 +183,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
           ),
           child: _isLoading
               ? const CircularProgressIndicator(color: Colors.white)
-              : const Text('Create User'),
+              : Text(AppLocalizations.of(context).createUser),
         ),
       ],
     );
@@ -213,8 +214,8 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to create user. Email may already exist.'),
+             SnackBar(
+              content: Text(AppLocalizations.of(context).failedToCreateUserEmailMayAlreadyExist),
               backgroundColor: Colors.red,
             ),
           );
@@ -224,7 +225,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error creating user: $e'),
+            content: Text(AppLocalizations.of(context).errorCreatingUser.replaceAll('{error}', e.toString())),
             backgroundColor: Colors.red,
           ),
         );

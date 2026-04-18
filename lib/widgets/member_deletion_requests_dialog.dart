@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/admin_user.dart';
 import '../services/firebase_service.dart';
+import '../l10n/app_localizations.dart';
 
 class MemberDeletionRequestsDialog extends StatefulWidget {
   final String currentUserId;
@@ -41,8 +42,8 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
               children: [
                 const Icon(Symbols.delete_forever, color: Colors.red),
                 const SizedBox(width: 8),
-                const Text(
-                  'Member Deletion Requests',
+                Text(
+                  AppLocalizations.of(context).deleteMember,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -75,7 +76,7 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
                   final requests = snapshot.data ?? [];
 
                   if (requests.isEmpty) {
-                    return const Center(
+                    return  Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -86,7 +87,7 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
                           ),
                           SizedBox(height: 16),
                           Text(
-                            'No pending member deletion requests',
+                            AppLocalizations.of(context).noPendingDeletionRequests,
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.grey,
@@ -121,30 +122,30 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Approve Member Deletion'),
+        title: Text(AppLocalizations.of(context).approveMemberDeletion),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Member: ${request.memberEmail}'),
-            Text('Name: ${request.memberName}'),
+            Text('${AppLocalizations.of(context).member}: ${request.memberEmail}'),
+            Text('${AppLocalizations.of(context).name}: ${request.memberName}'),
             const SizedBox(height: 8),
-            const Text('This action cannot be undone.'),
+            Text(AppLocalizations.of(context).thisActionCannotBeUndone),
             if (request.reason != null) ...[
               const SizedBox(height: 8),
-              Text('Reason: ${request.reason}'),
+              Text('${AppLocalizations.of(context).reason}: ${request.reason}'),
             ],
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Approve Deletion'),
+            child: Text(AppLocalizations.of(context).approveDeletion),
           ),
         ],
       ),
@@ -159,7 +160,7 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Member deleted successfully' : 'Failed to delete member'),
+            content: Text(success ? AppLocalizations.of(context).memberDeletedSuccessfully : AppLocalizations.of(context).failedToDeleteMember),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
         );
@@ -176,20 +177,20 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reject Member Deletion'),
+        title: Text(AppLocalizations.of(context).rejectMemberDeletion),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Member: ${request.memberEmail}'),
-            Text('Name: ${request.memberName}'),
+            Text('${AppLocalizations.of(context).member}: ${request.memberEmail}'),
+            Text('${AppLocalizations.of(context).name}: ${request.memberName}'),
             const SizedBox(height: 8),
-            const Text('Please provide a reason for rejection:'),
+            Text(AppLocalizations.of(context).pleaseProvideRejectionReason),
             const SizedBox(height: 8),
             TextField(
               controller: _rejectionReasonController,
-              decoration: const InputDecoration(
-                labelText: 'Rejection Reason',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).rejectionReason,
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -199,12 +200,12 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: const Text('Reject Request'),
+            child: Text(AppLocalizations.of(context).rejectRequest),
           ),
         ],
       ),
@@ -220,7 +221,7 @@ class _MemberDeletionRequestsDialogState extends State<MemberDeletionRequestsDia
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Request rejected' : 'Failed to reject request'),
+            content: Text(success ? AppLocalizations.of(context).requestRejected : AppLocalizations.of(context).failedToRejectRequest),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
         );
@@ -268,7 +269,7 @@ class MemberDeletionRequestCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        request.memberEmail ?? 'Unknown Member',
+                        request.memberEmail ?? AppLocalizations.of(context).unknownMember,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -276,7 +277,7 @@ class MemberDeletionRequestCard extends StatelessWidget {
                       ),
                       if (request.memberName != null)
                         Text(
-                          'Name: ${request.memberName}',
+                          '${AppLocalizations.of(context).name}: ${request.memberName}',
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,
@@ -284,7 +285,7 @@ class MemberDeletionRequestCard extends StatelessWidget {
                         ),
                       if (request.requestedByEmail != null)
                         Text(
-                          'Requested by: ${request.requestedByEmail}',
+                          '${AppLocalizations.of(context).requestedBy}: ${request.requestedByEmail}',
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,
@@ -311,7 +312,7 @@ class MemberDeletionRequestCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  'Reason: ${request.reason}',
+                  '${AppLocalizations.of(context).reason}: ${request.reason}',
                   style: const TextStyle(fontSize: 12),
                 ),
               ),
@@ -323,14 +324,14 @@ class MemberDeletionRequestCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onReject,
                   icon: const Icon(Symbols.close, size: 16),
-                  label: const Text('Reject'),
+                  label: Text(AppLocalizations.of(context).reject),
                   style: TextButton.styleFrom(foregroundColor: Colors.orange),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: onApprove,
                   icon: const Icon(Symbols.delete, size: 16),
-                  label: const Text('Approve Deletion'),
+                  label: Text(AppLocalizations.of(context).approveDeletion),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 ),
               ],

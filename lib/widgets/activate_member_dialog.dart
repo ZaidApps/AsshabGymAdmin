@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member.dart';
+import '../l10n/app_localizations.dart';
 
 class ActivateMemberDialog extends StatefulWidget {
   final PendingDeviceRegistration device;
@@ -39,7 +40,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
         children: [
           const Icon(Symbols.person_add, color: Colors.green),
           const SizedBox(width: 8),
-          const Text('Activate Member'),
+          Text(AppLocalizations.of(context).activateMember),
         ],
       ),
       content: SingleChildScrollView(
@@ -79,11 +80,11 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
               // Member Name Field
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Member Name',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).memberName,
                   hintText: 'Enter member name',
-                  prefixIcon: Icon(Symbols.person),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Symbols.person),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -97,11 +98,11 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
               // Phone Number Field
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).phoneNumber,
                   hintText: 'Enter member phone number',
-                  prefixIcon: Icon(Symbols.phone),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Symbols.phone),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
                 validator: (value) {
@@ -119,8 +120,8 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
               // Subscription Amount Field
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Subscription Amount',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).subscriptionAmount,
                   hintText: 'Enter subscription amount paid',
                   prefixIcon: Icon(Symbols.currency_exchange),
                   border: OutlineInputBorder(),
@@ -140,7 +141,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
 
               // Start Date Field
               ListTile(
-                title: const Text('Subscription Start Date'),
+                title: Text(AppLocalizations.of(context).subscriptionStartDate),
                 subtitle: Text(
                   _selectedStartDate != null
                       ? _formatDate(_selectedStartDate!)
@@ -170,7 +171,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
 
               // Expiry Date Field
               ListTile(
-                title: const Text('Subscription Expiry Date'),
+                title: Text(AppLocalizations.of(context).subscriptionExpiryDate),
                 subtitle: Text(
                   _selectedExpiryDate != null
                       ? _formatDate(_selectedExpiryDate!)
@@ -203,7 +204,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context).cancel),
         ),
         ElevatedButton(
           onPressed: _activateMember,
@@ -211,7 +212,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Activate Member'),
+          child: Text(AppLocalizations.of(context).activateMember),
         ),
       ],
     );

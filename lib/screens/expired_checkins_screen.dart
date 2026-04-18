@@ -4,6 +4,7 @@ import '../models/member.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 
 class ExpiredCheckinsScreen extends StatefulWidget {
   const ExpiredCheckinsScreen({super.key});
@@ -39,7 +40,7 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(width: 12),
           Text(
-            'Expired Check-ins',
+            AppLocalizations.of(context).expiredCheckins,
             style: AppTheme.heading2.copyWith(
               color: AppTheme.onSurfaceColor,
               fontWeight: FontWeight.w600,
@@ -66,9 +67,9 @@ Widget build(BuildContext context) {
               });
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'all', child: Text('All Attempts')),
-              const PopupMenuItem(value: 'today', child: Text('Today Only')),
-              const PopupMenuItem(value: 'week', child: Text('This Week')),
+              PopupMenuItem(value: 'all', child: Text(AppLocalizations.of(context).allAttempts)),
+              PopupMenuItem(value: 'today', child: Text(AppLocalizations.of(context).todayOnly)),
+              PopupMenuItem(value: 'week', child: Text(AppLocalizations.of(context).thisWeek)),
             ],
           ),
         ),
@@ -86,7 +87,7 @@ Widget build(BuildContext context) {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Search by date (YYYY-MM-DD)...',
+                  hintText: AppLocalizations.of(context).searchByNameOrPhone,
                   prefixIcon: const Icon(Symbols.search, color: AppTheme.onBackgroundColor),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -123,7 +124,7 @@ Widget build(BuildContext context) {
                       label: Text(
                         _startDate != null && _endDate != null
                             ? '${_formatDateForDisplay(_startDate)} - ${_formatDateForDisplay(_endDate)}'
-                            : 'Select Date Range',
+                            : AppLocalizations.of(context).selectDateRange,
                         style: const TextStyle(fontSize: 12),
                       ),
                       style: OutlinedButton.styleFrom(
@@ -153,10 +154,10 @@ Widget build(BuildContext context) {
                         });
                       },
                       itemBuilder: (context) => [
-                        const PopupMenuItem(value: 'all', child: Text('All Attempts')),
-                        const PopupMenuItem(value: 'today', child: Text('Today Only')),
-                        const PopupMenuItem(value: 'week', child: Text('This Week')),
-                        const PopupMenuItem(value: 'custom', child: Text('Custom Date Range')),
+                        PopupMenuItem(value: 'all', child: Text(AppLocalizations.of(context).allAttempts)),
+                        PopupMenuItem(value: 'today', child: Text(AppLocalizations.of(context).todayOnly)),
+                        PopupMenuItem(value: 'week', child: Text(AppLocalizations.of(context).thisWeek)),
+                        PopupMenuItem(value: 'custom', child: Text(AppLocalizations.of(context).customDateRange)),
                       ],
                     ),
                   ),
@@ -237,14 +238,14 @@ Widget build(BuildContext context) {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'No expired check-ins found',
+                        AppLocalizations.of(context).noExpiryCheckIn,
                         style: AppTheme.bodyLarge.copyWith(
                           color: AppTheme.onBackgroundColor,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'All check-ins are within valid subscription periods',
+                        AppLocalizations.of(context).allValidCheckIn,
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.onBackgroundColor,
                         ),
@@ -454,7 +455,7 @@ class ExpiredCheckInCard extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _showAttemptDetails(context, attempt),
                     icon: const Icon(Symbols.info, size: 18),
-                    label: const Text('View Details'),
+                    label: Text(AppLocalizations.of(context).viewDetails),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(

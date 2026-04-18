@@ -3,6 +3,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -75,8 +76,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Email updated successfully!'),
+             SnackBar(
+              content: Text(AppLocalizations.of(context).subscriptionRenewedSuccessfully),
               backgroundColor: AppTheme.successColor,
             ),
           );
@@ -86,8 +87,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           });
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to update email'),
+             SnackBar(
+              content: Text(AppLocalizations.of(context).failedToRenewSubscription),
               backgroundColor: AppTheme.errorColor,
             ),
           );
@@ -97,7 +98,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error updating email: $e'),
+              content: Text(AppLocalizations.of(context).errorUpdatingEmail.replaceAll('{error}', e.toString())),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -114,8 +115,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     if (_newPasswordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('New passwords do not match'),
+           SnackBar(
+            content: Text(AppLocalizations.of(context).newPasswordsDoNotMatch),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -135,8 +136,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Password updated successfully!'),
+             SnackBar(
+              content: Text(AppLocalizations.of(context).subscriptionRenewedSuccessfully),
               backgroundColor: AppTheme.successColor,
             ),
           );
@@ -148,8 +149,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           });
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to update password'),
+             SnackBar(
+              content: Text(AppLocalizations.of(context).failedToRenewSubscription),
               backgroundColor: AppTheme.errorColor,
             ),
           );
@@ -159,7 +160,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error updating password: $e'),
+              content: Text(AppLocalizations.of(context).errorUpdatingPassword.replaceAll('{error}', e.toString())),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -168,7 +169,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       setState(() => _isLoading = false);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final currentUser = _authService.currentUser;
@@ -179,13 +179,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         title: Row(
           children: [
             Icon(
-              Symbols.person,
+              Icons.person, // Changed from Symbols.person to Icons.person
               color: AppTheme.onSurfaceColor,
               size: 24,
             ),
             const SizedBox(width: 12),
             Text(
-              'User Profile',
+              AppLocalizations.of(context).memberName,
               style: AppTheme.heading2.copyWith(
                 color: AppTheme.onSurfaceColor,
                 fontWeight: FontWeight.w600,
@@ -226,7 +226,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           radius: 30,
                           backgroundColor: Colors.white,
                           child: Icon(
-                            Symbols.person,
+                            Icons.person, // Changed from Symbols.person to Icons.person
                             color: AppTheme.primaryColor,
                             size: 30,
                           ),
@@ -237,7 +237,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                currentUser?.displayName ?? 'Unknown User',
+                                currentUser?.displayName ?? AppLocalizations.of(context).unknownMember,
                                 style: AppTheme.heading2.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -273,18 +273,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Email Section
               _buildSectionCard(
-                title: 'Email Address',
-                icon: Symbols.email,
+                title: AppLocalizations.of(context).emailAddress,
+                icon: Icons.email, // Changed from Symbols.email to Icons.email
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Current Email: ${currentUser?.email ?? 'No email'}',
+                      AppLocalizations.of(context).currentEmail.replaceAll('{email}', currentUser?.email ?? 'No email'),
                       style: AppTheme.bodyMedium.copyWith(
                         color: AppTheme.onBackgroundColor,
                       ),
@@ -293,8 +293,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     if (!_showEmailFields)
                       ElevatedButton.icon(
                         onPressed: () => setState(() => _showEmailFields = true),
-                        icon: const Icon(Symbols.edit, size: 18),
-                        label: const Text('Change Email'),
+                        icon: const Icon(Icons.edit, size: 18), // Changed from Symbols.edit
+                        label: Text(AppLocalizations.of(context).changeEmail),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryColor,
                           foregroundColor: Colors.white,
@@ -303,19 +303,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     else ...[
                       TextFormField(
                         controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'New Email',
-                          hintText: 'Enter new email address',
-                          prefixIcon: Icon(Symbols.email),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context).newEmail,
+                          hintText: AppLocalizations.of(context).enterNewEmailAddress,
+                          prefixIcon: Icon(Icons.email), // Changed from Symbols.email
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter an email address';
+                            return AppLocalizations.of(context).pleaseEnterAnEmailAddress;
                           }
                           if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                            return 'Please enter a valid email address';
+                            return AppLocalizations.of(context).pleaseEnterAValidEmailAddress;
                           }
                           return null;
                         },
@@ -323,16 +323,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _emailPasswordController,
-                        decoration: const InputDecoration(
-                          labelText: 'Current Password',
-                          hintText: 'Enter your current password',
-                          prefixIcon: Icon(Symbols.lock),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context).currentPassword,
+                          hintText: AppLocalizations.of(context).pleaseEnterYourCurrentPassword,
+                          prefixIcon: Icon(Icons.lock), // Changed from Symbols.lock
                           border: OutlineInputBorder(),
                         ),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your current password';
+                            return AppLocalizations.of(context).pleaseEnterYourCurrentPassword;
                           }
                           return null;
                         },
@@ -346,7 +346,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 _showEmailFields = false;
                                 _emailPasswordController.clear();
                               }),
-                              child: const Text('Cancel'),
+                              child: Text(AppLocalizations.of(context).cancel),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -355,14 +355,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               onPressed: _isLoading ? null : _changeEmail,
                               child: _isLoading
                                   ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text('Update Email'),
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                                  : Text(AppLocalizations.of(context).emailUpdate),
                             ),
                           ),
                         ],
@@ -371,18 +371,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Password Section
               _buildSectionCard(
-                title: 'Password',
-                icon: Symbols.lock,
+                title: AppLocalizations.of(context).password,
+                icon: Icons.lock, // Changed from Symbols.lock
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Change your password to keep your account secure',
+                      AppLocalizations.of(context).changeYourPasswordToKeepAccountSecure,
                       style: AppTheme.bodyMedium.copyWith(
                         color: AppTheme.onBackgroundColor,
                       ),
@@ -391,8 +391,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     if (!_showPasswordFields)
                       ElevatedButton.icon(
                         onPressed: () => setState(() => _showPasswordFields = true),
-                        icon: const Icon(Symbols.lock_reset, size: 18),
-                        label: const Text('Change Password'),
+                        icon: const Icon(Icons.lock_reset, size: 18), // Changed from Symbols.lock_reset
+                        label: Text(AppLocalizations.of(context).changePassword),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryColor,
                           foregroundColor: Colors.white,
@@ -401,16 +401,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     else ...[
                       TextFormField(
                         controller: _currentPasswordController,
-                        decoration: const InputDecoration(
-                          labelText: 'Current Password',
-                          hintText: 'Enter your current password',
-                          prefixIcon: Icon(Symbols.lock),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context).currentPassword,
+                          hintText: AppLocalizations.of(context).pleaseEnterYourCurrentPassword,
+                          prefixIcon: Icon(Icons.lock), // Changed from Symbols.lock
                           border: OutlineInputBorder(),
                         ),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your current password';
+                            return AppLocalizations.of(context).pleaseEnterYourCurrentPassword;
                           }
                           return null;
                         },
@@ -418,19 +418,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _newPasswordController,
-                        decoration: const InputDecoration(
-                          labelText: 'New Password',
-                          hintText: 'Enter new password',
-                          prefixIcon: Icon(Symbols.lock),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context).newPassword,
+                          hintText: AppLocalizations.of(context).pleaseEnterANewPassword,
+                          prefixIcon: Icon(Icons.lock), // Changed from Symbols.lock
                           border: OutlineInputBorder(),
                         ),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a new password';
+                            return AppLocalizations.of(context).pleaseEnterANewPassword;
                           }
                           if (value.length < 6) {
-                            return 'Password must be at least 6 characters';
+                            return AppLocalizations.of(context).passwordMustBeAtLeast6Characters;
                           }
                           return null;
                         },
@@ -438,16 +438,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _confirmPasswordController,
-                        decoration: const InputDecoration(
-                          labelText: 'Confirm New Password',
-                          hintText: 'Confirm your new password',
-                          prefixIcon: Icon(Symbols.lock),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context).confirmPassword,
+                          hintText: AppLocalizations.of(context).pleaseConfirmYourNewPassword,
+                          prefixIcon: Icon(Icons.lock), // Changed from Symbols.lock
                           border: OutlineInputBorder(),
                         ),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please confirm your new password';
+                            return AppLocalizations.of(context).pleaseConfirmYourNewPassword;
                           }
                           return null;
                         },
@@ -463,7 +463,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 _newPasswordController.clear();
                                 _confirmPasswordController.clear();
                               }),
-                              child: const Text('Cancel'),
+                              child: Text(AppLocalizations.of(context).cancel),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -472,14 +472,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               onPressed: _isLoading ? null : _changePassword,
                               child: _isLoading
                                   ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text('Update Password'),
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                                  : Text(AppLocalizations.of(context).passwordUpdate),
                             ),
                           ),
                         ],
