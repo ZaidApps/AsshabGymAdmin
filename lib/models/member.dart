@@ -63,6 +63,11 @@ class Member {
     if (!isActive || subscriptionExpiryDate == null) return false;
     return DateTime.now().isBefore(subscriptionExpiryDate!.toDate());
   }
+  
+  bool get isExpired {
+    if (!isActive || subscriptionExpiryDate == null) return false;
+    return DateTime.now().isAfter(subscriptionExpiryDate!.toDate());
+  }
 }
 
 class PendingDeviceRegistration {
@@ -71,6 +76,7 @@ class PendingDeviceRegistration {
   final String platform;
   final bool acknowledged;
   final Timestamp? createdAt;
+  final String? docId;
 
   PendingDeviceRegistration({
     this.deviceId,
@@ -78,6 +84,7 @@ class PendingDeviceRegistration {
     required this.platform,
     required this.acknowledged,
     this.createdAt,
+    this.docId,
   });
 
   factory PendingDeviceRegistration.fromFirestore(DocumentSnapshot doc) {
@@ -88,6 +95,7 @@ class PendingDeviceRegistration {
       platform: data['platform'] ?? 'unknown',
       acknowledged: data['acknowledged'] ?? false,
       createdAt: data['created_at'],
+      docId: doc.id,
     );
   }
 

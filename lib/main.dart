@@ -31,7 +31,11 @@ class _GymAdminAppState extends State<GymAdminApp> {
   }
 
   Future<void> _loadLocale() async {
-    await LanguageService.getLocale();
+    final locale = await LanguageService.getLocale();
+    // Ensure locale is set before app builds
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _listenToLocaleChanges() {

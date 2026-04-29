@@ -797,6 +797,42 @@ class FirebaseService {
     }
   }
 
+  // Delete pending device registration (reject device)
+  Future<bool> deletePendingDeviceRegistration(String deviceDocId, {String? performedBy, String? performedByEmail, String? reason}) async {
+    try {
+      // Get the pending device data before deletion for history
+      final deviceDoc = await _pendingRegistrationsCollection.doc(deviceDocId).get();
+      if (!deviceDoc.exists) {
+        print('Pending device registration not found');
+        return false;
+      }
+
+      final deviceData = deviceDoc.data() as Map<String, dynamic>;
+      final deviceId = deviceData['device_id'] as String? ?? 'Unknown';
+      final platform = deviceData['platform'] as String? ?? 'Unknown';
+
+      // Delete the pending device registration
+      await _pendingRegistrationsCollection.doc(deviceDocId).delete();
+
+      // Add history record for the rejection
+      await addMemberHistory(
+        memberDocId: deviceDocId,
+        action: 'device_registration_rejected',
+        oldValue: 'Pending device registration: $deviceId ($platform)',
+        newValue: 'Device registration rejected and deleted',
+        performedBy: performedBy ?? 'admin',
+        performedByEmail: performedByEmail,
+        reason: reason ?? 'Device registration rejected by admin',
+      );
+
+      print('Pending device registration deleted successfully');
+      return true;
+    } catch (e) {
+      print('Error deleting pending device registration: $e');
+      return false;
+    }
+  }
+
   // Sanitize device ID for Firestore document ID
   String sanitizeDeviceId(String deviceId) {
     return deviceId.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '_');

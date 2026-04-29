@@ -96,9 +96,27 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                         ),
                     ],
                   ),
-                  trailing: ElevatedButton(
-                    onPressed: () => _showActivateMemberDialog(device),
-                    child: const Text('Activate'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _showActivateMemberDialog(device),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Activate'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => _showRejectDeviceDialog(device),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text(AppLocalizations.of(context).rejectDevice),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -160,6 +178,74 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
             }
           }
         },
+      ),
+    );
+  }
+
+  void _showRejectDeviceDialog(PendingDeviceRegistration device) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context).rejectDevice),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(AppLocalizations.of(context).rejectDeviceConfirmation),
+            const SizedBox(height: 16),
+            Text(
+              'Device ID: ${device.deviceId ?? "Unknown"}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text('Platform: ${device.platform.toUpperCase()}'),
+            if (device.createdAt != null)
+              Text('Registered: ${_formatDate(device.createdAt!.toDate())}'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: TextEditingController(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).reasonOptional,
+                border: const OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context).cancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              
+              final currentUser = _authService.currentUser;
+              final success = await _firebaseService.deletePendingDeviceRegistration(
+                device.docId!,
+                performedBy: currentUser?.displayName ?? 'admin',
+                performedByEmail: currentUser?.email,
+                reason: 'Device registration rejected by admin',
+              );
+              
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success ? AppLocalizations.of(context).deviceRejectedSuccessfully 
+                             : AppLocalizations.of(context).failedToRejectDevice,
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(AppLocalizations.of(context).reject),
+          ),
+        ],
       ),
     );
   }

@@ -65,6 +65,7 @@ class _MembersScreenState extends State<MembersScreen> {
                 PopupMenuItem(value: 'all', child: Text(AppLocalizations.of(context).allMembers)),
                 PopupMenuItem(value: 'active', child: Text(AppLocalizations.of(context).activeOnly)),
                 PopupMenuItem(value: 'pending', child: Text(AppLocalizations.of(context).pendingOnly)),
+                PopupMenuItem(value: 'expired', child: Text(AppLocalizations.of(context).expiredOnly)),
               ],
             ),
           ),
@@ -103,9 +104,11 @@ class _MembersScreenState extends State<MembersScreen> {
           final filteredMembers = members.where((member) {
             switch (_selectedStatus) {
               case 'active':
-                return member.isActive;
+                return member.isActive && !member.isExpired;
               case 'pending':
                 return member.isPending;
+              case 'expired':
+                return member.isExpired;
               default:
                 return true;
             }
@@ -214,17 +217,20 @@ class MemberCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: member.isActive ? AppTheme.successColor.withOpacity(0.1) : 
+                    color: member.isExpired ? AppTheme.errorColor.withOpacity(0.1) :
+                                   member.isActive ? AppTheme.successColor.withOpacity(0.1) : 
                                    member.isPending ? AppTheme.warningColor.withOpacity(0.1) : 
                                    AppTheme.errorColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundColor: member.isActive ? AppTheme.successColor : 
+                    backgroundColor: member.isExpired ? AppTheme.errorColor :
+                                   member.isActive ? AppTheme.successColor : 
                                    member.isPending ? AppTheme.warningColor : 
                                    AppTheme.errorColor,
                     child: Icon(
+                      member.isExpired ? Symbols.schedule : 
                       member.isActive ? Symbols.person : 
                              member.isPending ? Symbols.person_alert : 
                              Symbols.person_off,
@@ -250,15 +256,20 @@ class MemberCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: member.isActive ? AppTheme.successColor.withOpacity(0.1) : 
+                          color: member.isExpired ? AppTheme.errorColor.withOpacity(0.1) :
+                                     member.isActive ? AppTheme.successColor.withOpacity(0.1) : 
                                      member.isPending ? AppTheme.warningColor.withOpacity(0.1) : 
                                      AppTheme.errorColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          member.isActive ? AppLocalizations.of(context).active : member.isPending ? AppLocalizations.of(context).pending : AppLocalizations.of(context).inactive,
+                          member.isExpired ? AppLocalizations.of(context).expired : 
+                          member.isActive ? AppLocalizations.of(context).active : 
+                          member.isPending ? AppLocalizations.of(context).pending : 
+                          AppLocalizations.of(context).inactive,
                           style: AppTheme.bodySmall.copyWith(
-                            color: member.isActive ? AppTheme.successColor : 
+                            color: member.isExpired ? AppTheme.errorColor :
+                                       member.isActive ? AppTheme.successColor : 
                                        member.isPending ? AppTheme.warningColor : 
                                        AppTheme.errorColor,
                             fontWeight: FontWeight.w600,
@@ -388,8 +399,8 @@ class MemberCard extends StatelessWidget {
               _buildDetailRow(AppLocalizations.of(context).name, member.memberName ?? AppLocalizations.of(context).unknownMember, Symbols.person),
               _buildDetailRow(AppLocalizations.of(context).phoneNumber, member.phoneNumber ?? AppLocalizations.of(context).unknownMember, Symbols.phone),
               _buildDetailRow(AppLocalizations.of(context).deviceId, member.deviceId ?? AppLocalizations.of(context).unknownMember, Symbols.devices),
-              _buildDetailRow(AppLocalizations.of(context).status, member.isActive ? AppLocalizations.of(context).active : member.isPending ? AppLocalizations.of(context).pending : AppLocalizations.of(context).inactive, 
-                           member.isActive ? Symbols.check_circle : member.isPending ? Symbols.pending : Symbols.cancel),
+              _buildDetailRow(AppLocalizations.of(context).status, member.isExpired ? AppLocalizations.of(context).expired : member.isActive ? AppLocalizations.of(context).active : member.isPending ? AppLocalizations.of(context).pending : AppLocalizations.of(context).inactive, 
+                           member.isExpired ? Symbols.schedule : member.isActive ? Symbols.check_circle : member.isPending ? Symbols.pending : Symbols.cancel),
               if (member.subscriptionStartDate != null)
                 _buildDetailRow(AppLocalizations.of(context).startDate, _formatDate(member.subscriptionStartDate!.toDate()), Icons.calendar_today),
               if (member.subscriptionExpiryDate != null)

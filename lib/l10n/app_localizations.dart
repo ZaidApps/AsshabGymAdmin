@@ -84,6 +84,10 @@ class AppLocalizations {
   String get unknownMember => _localizedValues[locale.languageCode]!['unknownMember'] ?? 'Unknown Member';
   String get requestedBy => _localizedValues[locale.languageCode]!['requestedBy'] ?? 'Requested by';
   String get reject => _localizedValues[locale.languageCode]!['reject'] ?? 'Reject';
+  String get rejectDevice => _localizedValues[locale.languageCode]!['rejectDevice'] ?? 'Reject Device';
+  String get rejectDeviceConfirmation => _localizedValues[locale.languageCode]!['rejectDeviceConfirmation'] ?? 'Are you sure you want to reject this device registration? This action cannot be undone.';
+  String get deviceRejectedSuccessfully => _localizedValues[locale.languageCode]!['deviceRejectedSuccessfully'] ?? 'Device registration rejected successfully';
+  String get failedToRejectDevice => _localizedValues[locale.languageCode]!['failedToRejectDevice'] ?? 'Failed to reject device registration';
   String get deleteUserConfirmation => _localizedValues[locale.languageCode]!['deleteUserConfirmation'] ?? 'Are you sure you want to delete {name} ({email})? This action cannot be undone and the user will not be able to login again.';
   String get deleteUserTitle => _localizedValues[locale.languageCode]!['deleteUserTitle'] ?? 'Delete User';
   String get userDeletedSuccessfully => _localizedValues[locale.languageCode]!['userDeletedSuccessfully'] ?? 'User deleted successfully';
@@ -151,6 +155,7 @@ class AppLocalizations {
   String get allMembers => _localizedValues[locale.languageCode]!['allMembers'] ?? 'All Members';
   String get activeOnly => _localizedValues[locale.languageCode]!['activeOnly'] ?? 'Active Only';
   String get pendingOnly => _localizedValues[locale.languageCode]!['pendingOnly'] ?? 'Pending Only';
+  String get expiredOnly => _localizedValues[locale.languageCode]!['expiredOnly'] ?? 'Expired Only';
   String get errorLoadingMembers => _localizedValues[locale.languageCode]!['errorLoadingMembers'] ?? 'Error loading members';
   String get noMembersFound => _localizedValues[locale.languageCode]!['noMembersFound'] ?? 'No members found';
   String get tryAdjustingYourFiltersOrCheckBackLater => _localizedValues[locale.languageCode]!['tryAdjustingYourFiltersOrCheckBackLater'] ?? 'Try adjusting your filters or check back later';
@@ -393,6 +398,10 @@ class AppLocalizations {
       'unknownMember': 'Unknown Member',
       'requestedBy': 'Requested by',
       'reject': 'Reject',
+      'rejectDevice': 'Reject Device',
+      'rejectDeviceConfirmation': 'Are you sure you want to reject this device registration? This action cannot be undone.',
+      'deviceRejectedSuccessfully': 'Device registration rejected successfully',
+      'failedToRejectDevice': 'Failed to reject device registration',
       'deleteUserConfirmation': 'Are you sure you want to delete {name} ({email})? This action cannot be undone and the user will not be able to login again.',
       'deleteUserTitle': 'Delete User',
       'userDeletedSuccessfully': 'User deleted successfully',
@@ -461,6 +470,7 @@ class AppLocalizations {
       'allMembers': 'All Members',
       'activeOnly': 'Active Only',
       'pendingOnly': 'Pending Only',
+      'expiredOnly': 'Expired Only',
       'errorLoadingMembers': 'Error loading members',
       'noMembersFound': 'No members found',
       'tryAdjustingYourFiltersOrCheckBackLater': 'Try adjusting your filters or check back later',
@@ -631,6 +641,10 @@ class AppLocalizations {
       'unknownMember': 'عضو غير معروف',
       'requestedBy': 'مقدم الطلب',
       'reject': 'رفض',
+      'rejectDevice': 'رفض الجهاز',
+      'rejectDeviceConfirmation': 'هل أنت متأكد من رفض تسجيل هذا الجهاز؟ هذا الإجراء لا يمكن التراجع عنه.',
+      'deviceRejectedSuccessfully': 'تم رفض تسجيل الجهاز بنجاح',
+      'failedToRejectDevice': 'فشل في رفض تسجيل الجهاز',
       'deleteUserConfirmation': 'هل أنت متأكد من حذف {name} ({email})؟ هذا الإجراء لا يمكن التراجع عنه والمستخدم لن يتمكن من تسجيل الدخول مرة أخرى.',
       'deleteUserTitle': 'حذف المستخدم',
       'userDeletedSuccessfully': 'تم حذف المستخدم بنجاح',
@@ -699,6 +713,7 @@ class AppLocalizations {
       'allMembers': 'جميع الأعضاء',
       'activeOnly': 'النشطون فقط',
       'pendingOnly': 'المعلقون فقط',
+      'expiredOnly': 'منتهي الاشتراك فقط',
       'errorLoadingMembers': 'خطأ في تحميل الأعضاء',
       'noMembersFound': 'لم يتم العثور على أعضاء',
       'tryAdjustingYourFiltersOrCheckBackLater': 'حاول تعديل عوامل التصفية أو تحقق لاحقًا',

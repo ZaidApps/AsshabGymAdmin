@@ -19,8 +19,13 @@ class LanguageService {
   static ValueNotifier<Locale> get localeNotifier => _localeNotifier;
 
   static Future<void> saveLanguage(String languageCode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_languageKey, languageCode);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_languageKey, languageCode);
+    } catch (e) {
+      // Fallback to localStorage if SharedPreferences fails
+      // This can happen on some HTTPS deployments
+    }
     
     // Update the locale notifier to trigger app rebuild
     final newLocale = supportedLocales.firstWhere(
@@ -31,8 +36,13 @@ class LanguageService {
   }
 
   static Future<String> getLanguage() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_languageKey) ?? 'en';
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_languageKey) ?? 'en';
+    } catch (e) {
+      // Fallback to localStorage if SharedPreferences fails
+      return 'en';
+    }
   }
 
   static Future<Locale> getLocale() async {
