@@ -6,12 +6,14 @@ import 'screens/login_screen.dart';
 import 'theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'services/language_service.dart';
+import 'services/theme_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await ThemeService.init();
   runApp(const GymAdminApp());
 }
 
@@ -28,6 +30,7 @@ class _GymAdminAppState extends State<GymAdminApp> {
     super.initState();
     _loadLocale();
     _listenToLocaleChanges();
+    _listenToThemeChanges();
   }
 
   Future<void> _loadLocale() async {
@@ -44,21 +47,34 @@ class _GymAdminAppState extends State<GymAdminApp> {
     });
   }
 
+  void _listenToThemeChanges() {
+    ThemeService.themeNotifier.addListener(() {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Ashhab Gym',
-      theme: AppTheme.lightTheme,
-      locale: LanguageService.localeNotifier.value,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: LanguageService.supportedLocales,
-      home: const LoginScreen(),
-      debugShowCheckedModeBanner: false,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeService.themeNotifier,
+      builder: (context, themeMode, child) {
+        return MaterialApp(
+          title: 'Ashhab Gym',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          locale: LanguageService.localeNotifier.value,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: LanguageService.supportedLocales,
+          home: const LoginScreen(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }

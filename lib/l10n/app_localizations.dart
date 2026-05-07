@@ -266,16 +266,132 @@ class AppLocalizations {
   String get error => _localizedValues[locale.languageCode]!['error'] ?? 'Error';
   String get noExpiryCheckIn => _localizedValues[locale.languageCode]!['noExpiryCheckIn'] ?? 'No expired check-ins found';
   String get allValidCheckIn => _localizedValues[locale.languageCode]!['allValidCheckIn'] ?? 'All check-ins are within valid subscription periods';
+  String get selectOffer => _localizedValues[locale.languageCode]!['selectOffer'] ?? 'Select Offer';
+  String get chooseAnOffer => _localizedValues[locale.languageCode]!['chooseAnOffer'] ?? 'Choose an offer...';
+  String get noOfferUseStandardPricing => _localizedValues[locale.languageCode]!['noOfferUseStandardPricing'] ?? 'No Offer - Use Standard Pricing';
+  String get loadingOffers => _localizedValues[locale.languageCode]!['loadingOffers'] ?? 'Loading offers...';
+  String get frozenSince => _localizedValues[locale.languageCode]!['frozenSince'] ?? 'Frozen Since';
+  String get errorLoadingOffers => _localizedValues[locale.languageCode]!['errorLoadingOffers'] ?? 'Error loading offers: {error}';
+  String get noActiveOffersAvailable => _localizedValues[locale.languageCode]!['noActiveOffersAvailable'] ?? 'No Active Offers Available';
+  String get savedDays => _localizedValues[locale.languageCode]!['savedDays'] ?? 'Saved Days {days}';
+  String get unknown => _localizedValues[locale.languageCode]!['unknown'] ?? 'unknown';
+  String get freezeSubscription => _localizedValues[locale.languageCode]!['freezeSubscription'] ?? 'Freeze Subscription';
+  String get unfreezeSubscription => _localizedValues[locale.languageCode]!['unfreezeSubscription'] ?? 'unfreeze Subscription';
+  String get frozen => _localizedValues[locale.languageCode]!['frozen'] ?? 'Frozen';
+  String get areYouSureYouWantToFreezeSubscription => _localizedValues[locale.languageCode]!['areYouSureYouWantToFreezeSubscription'] ?? 'Are You Sure You Want To Freeze Subscription';
+  String get currentRemainingDays => _localizedValues[locale.languageCode]!['currentRemainingDays'] ?? 'Current Remaining Days : {days}';
+  String get theseDaysWillBeSaved => _localizedValues[locale.languageCode]!['theseDaysWillBeSaved'] ?? 'These Days Will Be Saved';
+  String get subscriptionFrozenSuccessfully => _localizedValues[locale.languageCode]!['subscriptionFrozenSuccessfully'] ??'Subscription Frozen Successfully';
+  String get failedToFreezeSubscription => _localizedValues[locale.languageCode]!['failedToFreezeSubscription'] ??'Failed To Freeze Subscription';
+  String get areYouSureYouWantToUnfreezeSubscription => _localizedValues[locale.languageCode]!['areYouSureYouWantToUnfreezeSubscription'] ??'Are You Sure You Want To Unfreeze Subscription';
+  String get subscriptionUnfrozenSuccessfully => _localizedValues[locale.languageCode]!['subscriptionUnfrozenSuccessfully'] ??'Subscription Unfrozen Successfully';
+  String get failedToUnfreezeSubscription => _localizedValues[locale.languageCode]!['failedToUnfreezeSubscription'] ??'Failed To Unfreeze Subscription';
+  String get offers => _localizedValues[locale.languageCode]!['offers'] ??'offers';
+  String get manageOffers => _localizedValues[locale.languageCode]!['manageOffers'] ?? 'Manage Offers & Bundles';
+  String get addOffer => _localizedValues[locale.languageCode]!['addOffer'] ??'Add Offer';
+  String get baseDuration => _localizedValues[locale.languageCode]!['baseDuration'] ?? 'Base Duration';
+  String get additionalDays => _localizedValues[locale.languageCode]!['additionalDays'] ?? 'Additional Days';
+  String get totalAmount => _localizedValues[locale.languageCode]!['totalAmount'] ?? 'Total Amount';
+  String get editOffer => _localizedValues[locale.languageCode]!['editOffer'] ?? 'Edit Offer';
+  String get deleteOffer => _localizedValues[locale.languageCode]!['deleteOffer'] ?? 'Delete Offer';
+  String get offerName => _localizedValues[locale.languageCode]!['offerName'] ?? 'Offer Name';
+  String get enterOfferName => _localizedValues[locale.languageCode]!['enterOfferName'] ?? 'Enter offer name';
+  String get pleaseEnterOfferName => _localizedValues[locale.languageCode]!['pleaseEnterOfferName'] ?? 'Please enter offer name';
+  String get enterAdditionalDays => _localizedValues[locale.languageCode]!['enterAdditionalDays'] ?? 'Enter additional days (0-30)';
+  String get pleaseEnterAdditionalDays => _localizedValues[locale.languageCode]!['pleaseEnterAdditionalDays'] ?? 'Please enter additional days';
+  String get pleaseEnterValidAdditionalDays => _localizedValues[locale.languageCode]!['pleaseEnterValidAdditionalDays'] ?? 'Please enter a valid number of additional days (0-30)';
+  String get enterTotalAmount => _localizedValues[locale.languageCode]!['enterTotalAmount'] ?? 'Enter total amount';
+  String get pleaseEnterTotalAmount => _localizedValues[locale.languageCode]!['pleaseEnterTotalAmount'] ?? 'Please enter total amount';
+  String get pleaseEnterValidAmount => _localizedValues[locale.languageCode]!['pleaseEnterValidAmount'] ?? 'Please enter a valid amount';
+  String get description => _localizedValues[locale.languageCode]!['description'] ?? 'Description';
+  String get enterDescription => _localizedValues[locale.languageCode]!['enterDescription'] ?? 'Enter description';
+  String get pleaseEnterDescription => _localizedValues[locale.languageCode]!['pleaseEnterDescription'] ?? 'Please enter description';
+  String get totalDays => _localizedValues[locale.languageCode]!['totalDays'] ?? 'Total Days';
+  String get month => _localizedValues[locale.languageCode]!['month'] ?? 'month';
+  String get months => _localizedValues[locale.languageCode]!['months'] ?? 'months';
+  String get days => _localizedValues[locale.languageCode]!['days'] ?? 'days';
+  String get gymHoursConfig => _localizedValues[locale.languageCode]!['gymHoursConfig'] ?? 'Gym Hours Configuration';
+  String get gymWorkingHours => _localizedValues[locale.languageCode]!['gymWorkingHours'] ?? 'Gym Working Hours';
+  String get configureGymWorkingHours => _localizedValues[locale.languageCode]!['configureGymWorkingHours'] ?? 'Configure your gym\'s working hours. Check-ins will be grouped by "gym day" instead of calendar day.';
+  String get gymHoursExample => _localizedValues[locale.languageCode]!['gymHoursExample'] ?? 'Example: 6:00 AM to 2:00 AM (next day)';
+  String get openingTime => _localizedValues[locale.languageCode]!['openingTime'] ?? 'Opening Time';
+  String get closingTime => _localizedValues[locale.languageCode]!['closingTime'] ?? 'Closing Time';
+  String get selectOpeningTime => _localizedValues[locale.languageCode]!['selectOpeningTime'] ?? 'Select opening time';
+  String get selectClosingTime => _localizedValues[locale.languageCode]!['selectClosingTime'] ?? 'Select closing time';
+  String get currentConfiguration => _localizedValues[locale.languageCode]!['currentConfiguration'] ?? 'Current Configuration';
+  String get gymDay => _localizedValues[locale.languageCode]!['gymDay'] ?? 'Gym Day';
+  String get saveConfiguration => _localizedValues[locale.languageCode]!['saveConfiguration'] ?? 'Save Configuration';
+  String get pleaseSelectBothOpeningAndClosingTimes => _localizedValues[locale.languageCode]!['pleaseSelectBothOpeningAndClosingTimes'] ?? 'Please select both opening and closing times';
+  String get gymHoursConfigurationSavedSuccessfully => _localizedValues[locale.languageCode]!['gymHoursConfigurationSavedSuccessfully'] ?? 'Gym hours configuration saved successfully';
+  String get errorSavingConfiguration => _localizedValues[locale.languageCode]!['errorSavingConfiguration'] ?? 'Error saving configuration: {error}';
+  String get accessDeniedAdminPrivilegesRequired => _localizedValues[locale.languageCode]!['accessDeniedAdminPrivilegesRequired'] ?? 'Access denied. Admin privileges required.';
+  
+  // New getters for manual registration and check-in
+  String get registerNewMember => _localizedValues[locale.languageCode]!['registerNewMember'] ?? 'Register New Member';
+  String get manualCheckIn => _localizedValues[locale.languageCode]!['manualCheckIn'] ?? 'Manual Check-In';
+  String get enterMemberName => _localizedValues[locale.languageCode]!['enterMemberName'] ?? 'Enter member name';
+  String get pleaseEnterMemberName => _localizedValues[locale.languageCode]!['pleaseEnterMemberName'] ?? 'Please enter member name';
+  String get enterPhoneNumber => _localizedValues[locale.languageCode]!['enterPhoneNumber'] ?? 'Enter phone number';
+  String get pleaseEnterPhoneNumber => _localizedValues[locale.languageCode]!['pleaseEnterPhoneNumber'] ?? 'Please enter phone number';
+  String get enterSubscriptionAmount => _localizedValues[locale.languageCode]!['enterSubscriptionAmount'] ?? 'Enter subscription amount';
+  String get selectMember => _localizedValues[locale.languageCode]!['selectMember'] ?? 'Select Member';
+  String get searchForMember => _localizedValues[locale.languageCode]!['searchForMember'] ?? 'Search for member...';
+  String get checkInMember => _localizedValues[locale.languageCode]!['checkInMember'] ?? 'Check-In Member';
+  String get memberNotActiveWarning => _localizedValues[locale.languageCode]!['memberNotActiveWarning'] ?? 'This member is not active. Are you sure you want to check them in?';
+  String get memberStatus => _localizedValues[locale.languageCode]!['memberStatus'] ?? 'Member Status';
+  String get manualCheckInConfirmation => _localizedValues[locale.languageCode]!['manualCheckInConfirmation'] ?? 'Manual check-in will be recorded for {name}. This action cannot be undone.';
+  String get memberRegisteredSuccessfully => _localizedValues[locale.languageCode]!['memberRegisteredSuccessfully'] ?? 'Member registered successfully!';
+  String get failedToRegisterMember => _localizedValues[locale.languageCode]!['failedToRegisterMember'] ?? 'Failed to register member';
+  String get memberCheckedInSuccessfully => _localizedValues[locale.languageCode]!['memberCheckedInSuccessfully'] ?? 'Member checked in successfully!';
+  String get failedToCheckInMember => _localizedValues[locale.languageCode]!['failedToCheckInMember'] ?? 'Failed to check in member';
+  String get registerMember => _localizedValues[locale.languageCode]!['registerMember'] ?? 'Register Member';
+  String get proceedAnyway => _localizedValues[locale.languageCode]!['proceedAnyway'] ?? 'Proceed Anyway';
+  String get uniqueIdGenerated => _localizedValues[locale.languageCode]!['uniqueIdGenerated'] ?? 'A unique ID will be generated automatically';
+  String get manualRegistrationSuccess => _localizedValues[locale.languageCode]!['manualRegistrationSuccess'] ?? 'Member has been successfully registered manually!';
+  String get manualCheckInSuccess => _localizedValues[locale.languageCode]!['manualCheckInSuccess'] ?? 'Member has been successfully checked in manually!';
+  
+  // Payment and balance getters
+  String get amountPaid => _localizedValues[locale.languageCode]!['amountPaid'] ?? 'Amount Paid';
+  String get pleaseEnterAmountPaid => _localizedValues[locale.languageCode]!['pleaseEnterAmountPaid'] ?? 'Please enter amount paid';
+  String get remainingBalance => _localizedValues[locale.languageCode]!['remainingBalance'] ?? 'Remaining Balance';
+  String get outstandingBalance => _localizedValues[locale.languageCode]!['outstandingBalance'] ?? 'Outstanding Balance';
+  String get fullyPaid => _localizedValues[locale.languageCode]!['fullyPaid'] ?? 'Fully Paid';
+  String get overpaid => _localizedValues[locale.languageCode]!['overpaid'] ?? 'Overpaid';
+  String get paymentInfo => _localizedValues[locale.languageCode]!['paymentInfo'] ?? 'Payment Information';
+  String get paidAmount => _localizedValues[locale.languageCode]!['paidAmount'] ?? 'Paid Amount';
+  String get balance => _localizedValues[locale.languageCode]!['balance'] ?? 'Balance';
 
   static const Map<String, Map<String, String>> _localizedValues = {
     'en': {
       'appTitle': 'Ashhab Gym',
       'dashboard': 'Dashboard',
       'members': 'Members',
-      'pendingDevices': 'Pending Devices',
+      'pendingDevices': 'New Subscription',
       'settings': 'Settings',
       'checkins': 'Check-ins',
+      'loadingOffers': 'loading Offers',
       'expiredCheckins': 'Expired Check-ins',
+      'baseDuration': 'Base Duration',
+      'additionalDays': 'Additional Days',
+      'totalAmount': 'Total Amount',
+      'editOffer': 'Edit Offer',
+      'deleteOffer': 'Delete Offer',
+      'offerName': 'Offer Name',
+      'enterOfferName': 'Enter offer name',
+      'pleaseEnterOfferName': 'Please enter offer name',
+      'enterAdditionalDays': 'Enter additional days (0-30)',
+      'pleaseEnterAdditionalDays': 'Please enter additional days',
+      'pleaseEnterValidAdditionalDays': 'Please enter a valid number of additional days (0-30)',
+      'enterTotalAmount': 'Enter total amount',
+      'pleaseEnterTotalAmount': 'Please enter total amount',
+      'pleaseEnterValidAmount': 'Please enter a valid amount',
+      'description': 'Description',
+      'enterDescription': 'Enter description',
+      'pleaseEnterDescription': 'Please enter description',
+      'totalDays': 'Total Days',
+      'month': 'month',
+      'months': 'months',
+      'days': 'days',
       'userManagement': 'User Management',
       'memberHistory': 'Member History',
       'userProfile': 'User Profile',
@@ -288,10 +404,12 @@ class AppLocalizations {
       'invalidMemberId': 'Invalid member ID. Cannot view history.',
       'performedBy': 'Performed By',
       'email': 'Email',
+      'selectOffer': 'Select Offer',
       'field': 'Field',
       'oldValue': 'Old Value',
       'newValue': 'New Value',
       'reason': 'Reason',
+      'noActiveOffersAvailable': 'No Active Offers Available',
       'dateTime': 'Date/Time',
       'statusChanged': 'Status Changed',
       'memberEdited': 'Member Edited',
@@ -306,6 +424,7 @@ class AppLocalizations {
       'viewCheckinHistory': 'View check-in history',
       'viewExpiredCheckins': 'View expired check-in attempts',
       'manageAdminUsers': 'Manage admin users',
+      'areYouSureYouWantToUnfreezeSubscription': 'Are You Sure You Want To Unfreeze Subscription',
       'viewMemberActivity': 'View member activity history',
       'manageAccountSettings': 'Manage your account settings',
       'viewPendingDevices': 'View pending device registrations',
@@ -322,6 +441,7 @@ class AppLocalizations {
       'failedToCreateSample': 'Failed to create sample data',
       'error': 'Error',
       'searchByNameOrPhone': 'Search by name or phone',
+      'subscriptionFrozenSuccessfully': 'Subscription Frozen Successfully',
       'selectedDate': 'Selected Date',
       'selectDateRange': 'Select Date Range',
       'allAttempts': 'All attempts',
@@ -351,6 +471,7 @@ class AppLocalizations {
       'password': 'Password',
       'loginButton': 'Login',
       'welcomeMessage': 'Welcome to Ashhab Gym Admin',
+      'areYouSureYouWantToFreezeSubscription': 'Are You Sure You Want To Freeze Subscription',
       'memberDetails': 'Member Details',
       'deviceId': 'Device ID',
       'phoneNumber': 'Phone Number',
@@ -395,9 +516,11 @@ class AppLocalizations {
       'rejectRequest': 'Reject Request',
       'requestRejected': 'Request rejected',
       'failedToRejectRequest': 'Failed to reject request',
+      'errorLoadingOffers': 'Error Loading Offers',
       'unknownMember': 'Unknown Member',
       'requestedBy': 'Requested by',
       'reject': 'Reject',
+      'unfreezeSubscription': 'unfreeze Subscription',
       'rejectDevice': 'Reject Device',
       'rejectDeviceConfirmation': 'Are you sure you want to reject this device registration? This action cannot be undone.',
       'deviceRejectedSuccessfully': 'Device registration rejected successfully',
@@ -413,12 +536,15 @@ class AppLocalizations {
       'thisRequestWillRequireAdminApproval': 'This request will require admin approval.',
       'reasonOptional': 'Reason (optional)',
       'requestDeletion': 'Request Deletion',
+      'freezeSubscription': 'Freeze Subscription',
       'deletionRequestSubmitted': 'Deletion request submitted',
       'failedToSubmitRequest': 'Failed to submit request',
       'userDetails': 'User Details',
+      'frozen': 'Frozen',
       'close': 'Close',
       'role': 'Role',
       'status': 'Status',
+      'unknown': 'unknown',
       'createdAt': 'Created At',
       'lastLogin': 'Last Login',
       'createdBy': 'Created By',
@@ -428,6 +554,7 @@ class AppLocalizations {
       'currentEmail': 'Current Email: {email}',
       'changeYourPasswordToKeepAccountSecure': 'Change your password to keep your account secure',
       'newEmail': 'New Email',
+      'frozenSince': 'Frozen Since',
       'enterNewEmailAddress': 'Enter new email address',
       'pleaseEnterAnEmailAddress': 'Please enter an email address',
       'pleaseEnterAValidEmailAddress': 'Please enter a valid email address',
@@ -436,6 +563,7 @@ class AppLocalizations {
       'errorUpdatingPassword': 'Error updating password: {error}',
       'pleaseEnterYourCurrentPassword': 'Please enter your current password',
       'pleaseEnterANewPassword': 'Please enter a new password',
+      'currentRemainingDays': 'Current Remaining Days : {days}',
       'passwordMustBeAtLeast6Characters': 'Password must be at least 6 characters',
       'pleaseConfirmYourNewPassword': 'Please confirm your new password',
       'newDeviceRegistrationsWillAppearHere': 'New device registrations will appear here',
@@ -446,15 +574,35 @@ class AppLocalizations {
       'startDate': 'Start Date',
       'expiryDate': 'Expiry Date',
       'newSubscriptionDetails': 'New Subscription Details',
+      'savedDays': 'Saved Days {days}',
       'newStartDate': 'New Start Date',
       'newExpiryDate': 'New Expiry Date',
       'selectStartDate': 'Select start date',
+      'manageOffers': 'Manage Offers & Bundles',
+      'offers': 'offers',
+      'gymHoursConfig': 'Gym Hours Configuration',
+      'gymWorkingHours': 'Gym Working Hours',
+      'configureGymWorkingHours': 'Configure your gym\'s working hours. Check-ins will be grouped by "gym day" instead of calendar day.',
+      'gymHoursExample': 'Example: 6:00 AM to 2:00 AM (next day)',
+      'openingTime': 'Opening Time',
+      'closingTime': 'Closing Time',
+      'selectOpeningTime': 'Select opening time',
+      'selectClosingTime': 'Select closing time',
+      'currentConfiguration': 'Current Configuration',
+      'gymDay': 'Gym Day',
+      'saveConfiguration': 'Save Configuration',
+      'pleaseSelectBothOpeningAndClosingTimes': 'Please select both opening and closing times',
+      'gymHoursConfigurationSavedSuccessfully': 'Gym hours configuration saved successfully',
+      'errorSavingConfiguration': 'Error saving configuration: {error}',
+      'accessDeniedAdminPrivilegesRequired': 'Access denied. Admin privileges required.',
+      'addOffer': 'Add Offer',
       'selectExpiryDate': 'Select expiry date',
       'enterAmountPaid': 'Enter amount paid',
       'pleaseEnterSubscriptionAmount': 'Please enter subscription amount',
       'pleaseEnterAValidAmount': 'Please enter a valid amount',
       'pleaseSelectAStartDate': 'Please select a start date',
       'pleaseSelectAnExpiryDate': 'Please select an expiry date',
+      'failedToUnfreezeSubscription': 'Failed To Unfreeze Subscription',
       'expiryDateMustBeAfterStartDate': 'Expiry date must be after start date',
       'pleaseEnterAValidSubscriptionAmount': 'Please enter a valid subscription amount',
       'welcomeBack': 'Welcome back!',
@@ -462,6 +610,7 @@ class AppLocalizations {
       'deactivateMember': 'Deactivate Member',
       'areYouSureYouWantToDeactivateActivateMember': 'Are you sure you want to {action} this member?',
       'memberDeactivatedSuccessfully': 'Member deactivated successfully',
+      'failedToFreezeSubscription': 'Failed To Freeze Subscription',
       'failedToUpdateMember': 'Failed to update member',
       'updatingMember': 'Updating member...',
       'memberSubscriptionUpdatedSuccessfully': 'Member subscription updated successfully',
@@ -475,6 +624,7 @@ class AppLocalizations {
       'noMembersFound': 'No members found',
       'tryAdjustingYourFiltersOrCheckBackLater': 'Try adjusting your filters or check back later',
       'createUser': 'Create User',
+      'theseDaysWillBeSaved': 'These Days Will Be Saved',
       'enterUserEmail': 'Enter user email',
       'pleaseEnterAnEmail': 'Please enter an email',
       'pleaseEnterAValidEmail': 'Please enter a valid email',
@@ -487,6 +637,7 @@ class AppLocalizations {
       'failedToCreateUserEmailMayAlreadyExist': 'Failed to create user. Email may already exist.',
       'errorCreatingUser': 'Error creating user: {error}',
       'errorLoadingMember': 'Error loading member data: {error}',
+      'subscriptionUnfrozenSuccessfully': 'Subscription Unfrozen Successfully',
       'fetchingMemberInformation': 'Fetching member information',
       'noPhoneNumber': 'No phone number',
       'unableToLoadMemberInformation': 'Unable to load member information',
@@ -509,13 +660,45 @@ class AppLocalizations {
       'pleaseEnterYourEmail': 'Please enter your email',
       'pleaseEnterYourPassword': 'Please enter your password',
       'invalidEmailOrPassword': 'Invalid email or password',
-      'loginFailed': 'Login failed'
+      'loginFailed': 'Login failed',
+      // New keys for manual registration and check-in
+      'registerNewMember': 'Register New Member',
+      'manualCheckIn': 'Manual Check-In',
+      'enterMemberName': 'Enter member name',
+      'pleaseEnterMemberName': 'Please enter member name',
+      'enterPhoneNumber': 'Enter phone number',
+      'pleaseEnterPhoneNumber': 'Please enter phone number',
+      'enterSubscriptionAmount': 'Enter subscription amount',
+      'selectMember': 'Select Member',
+      'searchForMember': 'Search for member...',
+      'checkInMember': 'Check-In Member',
+      'memberNotActiveWarning': 'This member is not active. Are you sure you want to check them in?',
+      'memberStatus': 'Member Status',
+      'manualCheckInConfirmation': 'Manual check-in will be recorded for {name}. This action cannot be undone.',
+      'memberRegisteredSuccessfully': 'Member registered successfully!',
+      'failedToRegisterMember': 'Failed to register member',
+      'memberCheckedInSuccessfully': 'Member checked in successfully!',
+      'failedToCheckInMember': 'Failed to check in member',
+      'registerMember': 'Register Member',
+      'proceedAnyway': 'Proceed Anyway',
+      'uniqueIdGenerated': 'A unique ID will be generated automatically',
+      'manualRegistrationSuccess': 'Member has been successfully registered manually!',
+      'manualCheckInSuccess': 'Member has been successfully checked in manually!',
+      'amountPaid': 'Amount Paid',
+      'pleaseEnterAmountPaid': 'Please enter amount paid',
+      'remainingBalance': 'Remaining Balance',
+      'outstandingBalance': 'Outstanding Balance',
+      'fullyPaid': 'Fully Paid',
+      'overpaid': 'Overpaid',
+      'paymentInfo': 'Payment Information',
+      'paidAmount': 'Paid Amount',
+      'balance': 'Balance'
     },
     'ar': {
       'appTitle': 'نظام إدارة صالة الأشهب',
       'dashboard': 'لوحة التحكم',
       'members': 'الأعضاء',
-      'pendingDevices': 'الأجهزة المعلقة',
+      'pendingDevices': 'اشتراك جديد',
       'settings': 'الإعدادات',
       'logout': 'تسجيل الخروج',
       'login': 'تسجيل الدخول',
@@ -602,7 +785,6 @@ class AppLocalizations {
       'subscriptionStartDate': 'تاريخ بداية الاشتراك',
       'subscriptionExpiryDate': 'تاريخ انتهاء الاشتراك',
       'subscriptionAmount': 'مبلغ الاشتراك',
-      'active': 'نشط',
       'pending': 'معلق',
       'inactive': 'غير نشط',
       'edit': 'تعديل',
@@ -689,8 +871,6 @@ class AppLocalizations {
       'startDate': 'تاريخ البدء',
       'expiryDate': 'تاريخ الانتهاء',
       'newSubscriptionDetails': 'تفاصيل الاشتراك الجديد',
-      'newStartDate': 'تاريخ البدء الجديد',
-      'newExpiryDate': 'تاريخ الانتهاء الجديد',
       'selectStartDate': 'اختر تاريخ البدء',
       'selectExpiryDate': 'اختر تاريخ الانتهاء',
       'enterAmountPaid': 'أدخل المبلغ المدفوع',
@@ -752,7 +932,113 @@ class AppLocalizations {
       'pleaseEnterYourEmail': 'الرجاء إدخال بريدك الإلكتروني',
       'pleaseEnterYourPassword': 'الرجاء إدخال كلمة المرور',
       'invalidEmailOrPassword': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-      'loginFailed': 'فشل تسجيل الدخول'
+      'loginFailed': 'فشل تسجيل الدخول',
+      // Gym Hours Configuration
+      'gymHoursConfig': 'تكوين ساعات العمل',
+      'gymWorkingHours': 'ساعات العمل',
+      'configureGymWorkingHours': 'قم بتكوين ساعات عمل صالتك. سيتم تجميع الحضور حسب "يوم الصالة" بدلاً من اليوم التقويمي.',
+      'gymHoursExample': 'مثال: 6:00 ص إلى 2:00 ص (اليوم التالي)',
+      'openingTime': 'وقت الافتتاح',
+      'closingTime': 'وقت الإغلاق',
+      'selectOpeningTime': 'اختر وقت الافتتاح',
+      'selectClosingTime': 'اختر وقت الإغلاق',
+      'currentConfiguration': 'التكوين الحالي',
+      'gymDay': 'يوم الصالة',
+      'saveConfiguration': 'حفظ التكوين',
+      'pleaseSelectBothOpeningAndClosingTimes': 'الرجاء تحديد وقتي الافتتاح والإغلاق',
+      'gymHoursConfigurationSavedSuccessfully': 'تم حفظ تكوين ساعات العمل بنجاح',
+      'errorSavingConfiguration': 'خطأ في حفظ التكوين: {error}',
+      'accessDeniedAdminPrivilegesRequired': 'الوصول مرفوض. مطلوب صلاحيات المدير.',
+      // Offers & Bundles
+      'offers': 'العروض والباقات',
+      'manageOffers': 'إدارة العروض والباقات',
+      'offerName': 'اسم العرض',
+      'baseDuration': 'المدة الأساسية',
+      'additionalDays': 'الأيام الإضافية',
+      'totalAmount': 'المبلغ الإجمالي',
+      'description': 'الوصف',
+      'active': 'نشط',
+      'addOffer': 'إضافة عرض',
+      'editOffer': 'تعديل العرض',
+      'deleteOffer': 'حذف العرض',
+      'offerCreatedSuccessfully': 'تم إنشاء العرض بنجاح!',
+      'failedToCreateOffer': 'فشل في إنشاء العرض',
+      'offerUpdatedSuccessfully': 'تم تحديث العرض بنجاح!',
+      'failedToUpdateOffer': 'فشل في تحديث العرض',
+      'offerDeletedSuccessfully': 'تم حذف العرض بنجاح!',
+      'failedToDeleteOffer': 'فشل في حذف العرض',
+      'offerActivatedSuccessfully': 'تم تفعيل العرض بنجاح!',
+      'offerDeactivatedSuccessfully': 'تم إلغاء تفعيل العرض بنجاح!',
+      'areYouSureYouWantToDeleteOffer': 'هل أنت متأكد من حذف {name}؟ هذا الإجراء لا يمكن التراجع عنه.',
+      'enterOfferName': 'أدخل اسم العرض',
+      'pleaseEnterOfferName': 'الرجاء إدخال اسم العرض',
+      'selectBaseDuration': 'اختر المدة الأساسية',
+      'enterAdditionalDays': 'أدخل الأيام الإضافية (0-30)',
+      'pleaseEnterValidAdditionalDays': 'الرجاء إدخال عدد صحيح من الأيام الإضافية (0-30)',
+      'enterTotalAmount': 'أدخل المبلغ الإجمالي',
+      'pleaseEnterTotalAmount': 'الرجاء إدخال المبلغ الإجمالي',
+      'pleaseEnterValidAmount': 'الرجاء إدخال مبلغ صحيح',
+      'enterDescription': 'أدخل الوصف',
+      'pleaseEnterDescription': 'الرجاء إدخال الوصف',
+      'totalDays': 'إجمالي الأيام',
+      'month': 'شهر',
+      'months': 'أشهر',
+      'days': 'أيام',
+      'noActiveOffersAvailable': 'لا توجد عروض نشطة متاحة',
+      'selectOffer': 'اختر العرض (اختياري)',
+      'chooseAnOffer': 'اختر عرضاً...',
+      'noOfferUseStandardPricing': 'لا يوجد عرض - استخدم التسعير القياسي',
+      'loadingOffers': 'جاري تحميل العروض...',
+      'errorLoadingOffers': 'خطأ في تحميل العروض: {error}',
+      // Freeze/Unfreeze Feature
+      'frozen': 'مجمد',
+      'freezeSubscription': 'تجميد الاشتراك',
+      'unfreezeSubscription': 'إلغاء تجميد الاشتراك',
+      'subscriptionFrozenSuccessfully': 'تم تجميد الاشتراك بنجاح!',
+      'failedToFreezeSubscription': 'فشل في تجميد الاشتراك',
+      'subscriptionUnfrozenSuccessfully': 'تم إلغاء تجميد الاشتراك بنجاح!',
+      'failedToUnfreezeSubscription': 'فشل في إلغاء تجميد الاشتراك',
+      'areYouSureYouWantToFreezeSubscription': 'هل أنت متأكد من تجميد اشتراك هذا العضو؟',
+      'areYouSureYouWantToUnfreezeSubscription': 'هل أنت متأكد من إلغاء تجميد اشتراك هذا العضو؟',
+      'currentRemainingDays': 'الأيام المتبقية الحالية: {days}',
+      'theseDaysWillBeSaved': 'سيتم حفظ هذه الأيام وإضافتها مرة أخرى عند إلغاء التجميد',
+      'savedDays': 'الأيام المحفوظة: {days}',
+      'newExpiryDate': 'تاريخ الانتهاء الجديد: {date}',
+      'newStartDate': 'تاريخ البدء الجديد: اليوم ({date})',
+      'frozenSince': 'مجمد منذ',
+      'unknown': 'غير معروف',
+      // New keys for manual registration and check-in
+      'registerNewMember': 'تسجيل عضو جديد',
+      'manualCheckIn': 'تسجيل دخول يدوي',
+      'enterMemberName': 'أدخل اسم العضو',
+      'pleaseEnterMemberName': 'الرجاء إدخال اسم العضو',
+      'enterPhoneNumber': 'أدخل رقم الهاتف',
+      'pleaseEnterPhoneNumber': 'الرجاء إدخال رقم الهاتف',
+      'enterSubscriptionAmount': 'أدخل مبلغ الاشتراك',
+      'selectMember': 'اختر العضو',
+      'searchForMember': 'ابحث عن عضو...',
+      'checkInMember': 'تسجيل دخول العضو',
+      'memberNotActiveWarning': 'هذا العضو غير نشط. هل أنت متأكد من تسجيل دخوله؟',
+      'memberStatus': 'حالة العضو',
+      'manualCheckInConfirmation': 'سيتم تسجيل الدخول اليدوي لـ {name}. هذا الإجراء لا يمكن التراجع عنه.',
+      'memberRegisteredSuccessfully': 'تم تسجيل العضو بنجاح!',
+      'failedToRegisterMember': 'فشل في تسجيل العضو',
+      'memberCheckedInSuccessfully': 'تم تسجيل دخول العضو بنجاح!',
+      'failedToCheckInMember': 'فشل في تسجيل دخول العضو',
+      'registerMember': 'تسجيل العضو',
+      'proceedAnyway': 'المتابعة على أي حال',
+      'uniqueIdGenerated': 'سيتم إنشاء معرف فريد تلقائيًا',
+      'manualRegistrationSuccess': 'تم تسجيل العضو بنجاح يدويًا!',
+      'manualCheckInSuccess': 'تم تسجيل دخول العضو بنجاح يدويًا!',
+      'amountPaid': 'المبلغ المدفوع',
+      'pleaseEnterAmountPaid': 'الرجاء إدخال المبلغ المدفوع',
+      'remainingBalance': 'الرصيد المتبقي',
+      'outstandingBalance': 'الرصيد المستحق',
+      'fullyPaid': 'مدفوع بالكامل',
+      'overpaid': 'مدفوع زيادة',
+      'paymentInfo': 'معلومات الدفع',
+      'paidAmount': 'المبلغ المدفوع',
+      'balance': 'الرصيد'
     }
   };
 }

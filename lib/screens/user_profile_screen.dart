@@ -78,7 +78,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
              SnackBar(
               content: Text(AppLocalizations.of(context).subscriptionRenewedSuccessfully),
-              backgroundColor: AppTheme.successColor,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
           setState(() {
@@ -89,7 +89,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
              SnackBar(
               content: Text(AppLocalizations.of(context).failedToRenewSubscription),
-              backgroundColor: AppTheme.errorColor,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -99,7 +99,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(AppLocalizations.of(context).errorUpdatingEmail.replaceAll('{error}', e.toString())),
-            backgroundColor: AppTheme.errorColor,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -117,7 +117,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
            SnackBar(
             content: Text(AppLocalizations.of(context).newPasswordsDoNotMatch),
-          backgroundColor: AppTheme.errorColor,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -138,7 +138,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
              SnackBar(
               content: Text(AppLocalizations.of(context).subscriptionRenewedSuccessfully),
-              backgroundColor: AppTheme.successColor,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
           setState(() {
@@ -151,7 +151,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
              SnackBar(
               content: Text(AppLocalizations.of(context).failedToRenewSubscription),
-              backgroundColor: AppTheme.errorColor,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -161,7 +161,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(AppLocalizations.of(context).errorUpdatingPassword.replaceAll('{error}', e.toString())),
-            backgroundColor: AppTheme.errorColor,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -174,26 +174,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final currentUser = _authService.currentUser;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: Row(
           children: [
             Icon(
               Icons.person, // Changed from Symbols.person to Icons.person
-              color: AppTheme.onSurfaceColor,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 24,
             ),
             const SizedBox(width: 12),
             Text(
               AppLocalizations.of(context).memberName,
-              style: AppTheme.heading2.copyWith(
-                color: AppTheme.onSurfaceColor,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ],
         ),
-        backgroundColor: AppTheme.surfaceColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -207,11 +207,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),
@@ -224,10 +231,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       children: [
                         CircleAvatar(
                           radius: 30,
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.surface,
                           child: Icon(
                             Icons.person, // Changed from Symbols.person to Icons.person
-                            color: AppTheme.primaryColor,
+                            color: Theme.of(context).colorScheme.primary,
                             size: 30,
                           ),
                         ),
@@ -238,29 +245,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             children: [
                               Text(
                                 currentUser?.displayName ?? AppLocalizations.of(context).unknownMember,
-                                style: AppTheme.heading2.copyWith(
-                                  color: Colors.white,
+                                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 currentUser?.email ?? 'No email',
-                                style: AppTheme.bodyMedium.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.9),
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
                                   currentUser?.role.name.toUpperCase() ?? 'USER',
-                                  style: AppTheme.bodySmall.copyWith(
-                                    color: AppTheme.primaryColor,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -285,8 +292,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   children: [
                     Text(
                       AppLocalizations.of(context).currentEmail.replaceAll('{email}', currentUser?.email ?? 'No email'),
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppTheme.onBackgroundColor,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -296,8 +303,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         icon: const Icon(Icons.edit, size: 18), // Changed from Symbols.edit
                         label: Text(AppLocalizations.of(context).changeEmail),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryColor,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         ),
                       )
                     else ...[
@@ -354,12 +361,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             child: ElevatedButton(
                               onPressed: _isLoading ? null : _changeEmail,
                               child: _isLoading
-                                  ? const SizedBox(
+                                  ?  SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                               )
                                   : Text(AppLocalizations.of(context).emailUpdate),
@@ -383,8 +390,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   children: [
                     Text(
                       AppLocalizations.of(context).changeYourPasswordToKeepAccountSecure,
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppTheme.onBackgroundColor,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -394,8 +401,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         icon: const Icon(Icons.lock_reset, size: 18), // Changed from Symbols.lock_reset
                         label: Text(AppLocalizations.of(context).changePassword),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryColor,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         ),
                       )
                     else ...[
@@ -471,12 +478,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             child: ElevatedButton(
                               onPressed: _isLoading ? null : _changePassword,
                               child: _isLoading
-                                  ? const SizedBox(
+                                  ?  SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                               )
                                   : Text(AppLocalizations.of(context).passwordUpdate),
@@ -504,9 +511,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -522,14 +529,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             children: [
               Icon(
                 icon,
-                color: AppTheme.primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 size: 24,
               ),
               const SizedBox(width: 12),
               Text(
                 title,
-                style: AppTheme.heading3.copyWith(
-                  color: AppTheme.onSurfaceColor,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),

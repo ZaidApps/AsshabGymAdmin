@@ -5,6 +5,7 @@ import '../models/member.dart';
 import '../models/admin_user.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import 'members_screen.dart';
 import 'checkins_screen.dart';
@@ -14,8 +15,10 @@ import 'member_history_screen.dart';
 import 'user_profile_screen.dart';
 import 'user_management_screen.dart';
 import 'pending_devices_screen.dart';
+import 'offers_screen.dart';
 import '../widgets/language_switcher.dart';
 import '../l10n/app_localizations.dart';
+import 'gym_hours_config_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -31,14 +34,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         toolbarHeight: 80,
         title: Row(
           children: [
             Icon(
               Symbols.dashboard,
-              color: AppTheme.onSurfaceColor,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 24,
             ),
             const SizedBox(width: 12),
@@ -47,8 +50,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
               children: [
                 Text(
                   AppLocalizations.of(context).dashboard,
-                  style: AppTheme.heading2.copyWith(
-                    color: AppTheme.onSurfaceColor,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -59,8 +62,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     if (email != null) {
                       return Text(
                         email!,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -78,21 +81,45 @@ class _AdminDashboardState extends State<AdminDashboard> {
             onPressed: _refreshDashboard,
             icon: Icon(
               Symbols.refresh,
-              color: AppTheme.onSurfaceColor,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 20,
             ),
             tooltip: AppLocalizations.of(context).refreshDashboard,
+          ),
+          ValueListenableBuilder<ThemeMode>(
+            valueListenable: ThemeService.themeNotifier,
+            builder: (context, themeMode, child) {
+              return IconButton(
+                onPressed: _showThemeSelector,
+                icon: Icon(
+                  _getThemeIcon(themeMode),
+                  color: Theme.of(context).colorScheme.onSurface,
+                  size: 20,
+                ),
+                tooltip: 'Change Theme',
+              );
+            },
           ),
           const LanguageSwitcher(),
           PopupMenuButton<String>(
             icon: Icon(
               Symbols.more_vert,
-              color: AppTheme.onSurfaceColor,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 20,
             ),
             onSelected: _handleMenuAction,
             itemBuilder: (context) => [
-               PopupMenuItem(
+              PopupMenuItem(
+                value: 'gym_hours_config',
+                child: Row(
+                  children: [
+                    Icon(Symbols.schedule, size: 16),
+                    SizedBox(width: 8),
+                    Text(AppLocalizations.of(context).gymHoursConfig),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
                 value: 'logout',
                 child: Row(
                   children: [
@@ -115,11 +142,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
+                gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primaryColor.withOpacity(0.2),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -130,16 +164,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 children: [
                   Text(
                     AppLocalizations.of(context).welcomeBack,
-                    style: AppTheme.heading1.copyWith(
-                      color: Colors.white,
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     AppLocalizations.of(context).gymTodayMessage,
-                    style: AppTheme.bodyLarge.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -182,12 +216,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           mainAxisSpacing: 12,
                           childAspectRatio: 1.0,
                           children: [
-                            _buildStatCard(AppLocalizations.of(context).members, stats['total'].toString(), AppTheme.primaryColor, Symbols.people),
-                            _buildStatCard(AppLocalizations.of(context).activeMembers, stats['active'].toString(), AppTheme.successColor, Symbols.person_check),
-                            _buildStatCard(AppLocalizations.of(context).inactiveMembers, stats['inactive'].toString(), Colors.grey, Symbols.person_off),
-                            _buildStatCard(AppLocalizations.of(context).expiredMembers, stats['expired'].toString(), AppTheme.errorColor, Icons.event_busy),
-                            _buildStatCard(AppLocalizations.of(context).todaysCheckins, todayCheckins.toString(), AppTheme.accentColor, Symbols.check_circle),
-                            _buildStatCard(AppLocalizations.of(context).pendingDevices, stats['pending'].toString(), AppTheme.warningColor, Symbols.pending_actions),
+                            _buildStatCard(AppLocalizations.of(context).members, stats['total'].toString(), Theme.of(context).colorScheme.primary, Symbols.people),
+                            _buildStatCard(AppLocalizations.of(context).activeMembers, stats['active'].toString(), Theme.of(context).colorScheme.primary, Symbols.person_check),
+                            _buildStatCard(AppLocalizations.of(context).inactiveMembers, stats['inactive'].toString(), Theme.of(context).colorScheme.onSurface.withOpacity(0.6), Symbols.person_off),
+                            _buildStatCard(AppLocalizations.of(context).expiredMembers, stats['expired'].toString(), Theme.of(context).colorScheme.error, Icons.event_busy),
+                            _buildStatCard(AppLocalizations.of(context).todaysCheckins, todayCheckins.toString(), Theme.of(context).colorScheme.secondary, Symbols.check_circle),
+                            _buildStatCard(AppLocalizations.of(context).pendingDevices, stats['pending'].toString(), Theme.of(context).colorScheme.secondary, Symbols.pending_actions),
                           ],
                         );
                       },
@@ -202,8 +236,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             // Quick Actions
             Text(
               AppLocalizations.of(context).quickActions,
-              style: AppTheme.heading3.copyWith(
-                color: AppTheme.onSurfaceColor,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -226,50 +260,57 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       AppLocalizations.of(context).members,
                       AppLocalizations.of(context).manageGymMembers,
                       Symbols.people,
-                      AppTheme.primaryColor,
+                      Theme.of(context).colorScheme.primary,
                       () => _navigateTo(const MembersScreen()),
                     ),
                     _buildActionCard(
                       AppLocalizations.of(context).checkins,
                       AppLocalizations.of(context).viewCheckinHistory,
                       Symbols.check_circle,
-                      AppTheme.successColor,
+                      Theme.of(context).colorScheme.primary,
                       () => _navigateTo(const CheckinsScreen()),
                     ),
                     _buildActionCard(
                       AppLocalizations.of(context).expiredCheckins,
                       AppLocalizations.of(context).viewExpiredCheckins,
                       Symbols.warning,
-                      AppTheme.errorColor,
+                      Theme.of(context).colorScheme.error,
                       () => _navigateTo(const ExpiredCheckinsScreen()),
                     ),
                     _buildActionCard(
                       AppLocalizations.of(context).userManagement,
                       AppLocalizations.of(context).manageAdminUsers,
                       Symbols.admin_panel_settings,
-                      AppTheme.accentColor,
+                      Theme.of(context).colorScheme.secondary,
                       () => _navigateTo(const UserManagementScreen()),
                     ),
                     _buildActionCard(
                       AppLocalizations.of(context).memberHistory,
                       AppLocalizations.of(context).viewMemberActivity,
                       Symbols.history,
-                      Colors.purple,
+                      Theme.of(context).colorScheme.tertiary,
                       () => _showMemberHistorySelector(),
                     ),
                     _buildActionCard(
                       AppLocalizations.of(context).userProfile,
                       AppLocalizations.of(context).manageAccountSettings,
                       Symbols.person,
-                      AppTheme.secondaryColor,
+                      Theme.of(context).colorScheme.secondary,
                       () => _navigateTo(const UserProfileScreen()),
                     ),
                     _buildActionCard(
                       AppLocalizations.of(context).pendingDevices,
                       AppLocalizations.of(context).viewPendingDevices,
                       Symbols.devices,
-                      AppTheme.warningColor,
+                      Theme.of(context).colorScheme.secondary,
                       () => _navigateTo(const PendingDevicesScreen()),
+                    ),
+                    _buildActionCard(
+                      AppLocalizations.of(context).offers,
+                      AppLocalizations.of(context).manageOffers,
+                      Symbols.local_offer,
+                      Theme.of(context).colorScheme.secondary,
+                      () => _navigateTo(const OffersScreen()),
                     ),
                   ],
                 );
@@ -281,8 +322,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             // Recent Activity
            /* Text(
               'Recent Activity',
-              style: AppTheme.heading3.copyWith(
-                color: AppTheme.onSurfaceColor,
+              style: Theme.of(context).textTheme.titleLarge.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -314,14 +355,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -341,7 +382,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               const Spacer(),
               Text(
                 value,
-                style: AppTheme.heading3.copyWith(
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: color,
                   fontWeight: FontWeight.w700,
                 ),
@@ -351,8 +392,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           const SizedBox(height: 8),
           Text(
             title,
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.onBackgroundColor,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onBackground,
               fontWeight: FontWeight.w500,
             ),
             maxLines: 2,
@@ -372,13 +413,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -397,15 +438,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 const SizedBox(height: 12),
                 Text(
                   title,
-                  style: AppTheme.bodyLarge.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onBackgroundColor,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
                   ),
                 ),
               ],
@@ -425,7 +466,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             width: 4,
             height: 4,
             decoration: BoxDecoration(
-              color: AppTheme.primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -433,15 +474,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
           Expanded(
             child: Text(
               title,
-              style: AppTheme.bodyMedium.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
           Text(
             time,
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.onBackgroundColor,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onBackground,
             ),
           ),
         ],
@@ -458,6 +499,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   void _handleMenuAction(String action) {
     switch (action) {
+      case 'gym_hours_config':
+        _navigateTo(const GymHoursConfigScreen());
+        break;
       case 'logout':
         _logout();
         break;
@@ -482,6 +526,131 @@ class _AdminDashboardState extends State<AdminDashboard> {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const LoginScreen()),
       (Route<dynamic> route) => false,
+    );
+  }
+
+  IconData _getThemeIcon(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return Symbols.light_mode;
+      case ThemeMode.dark:
+        return Symbols.dark_mode;
+      case ThemeMode.system:
+        return Symbols.settings_brightness;
+    }
+  }
+
+  void _showThemeSelector() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Select Theme',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            inherit: true,
+          ),
+        ),
+        content: StatefulBuilder(
+          builder: (context, setState) {
+            return ValueListenableBuilder<ThemeMode>(
+              valueListenable: ThemeService.themeNotifier,
+              builder: (context, currentTheme, child) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildThemeOption(
+                      context,
+                      title: 'Light Mode',
+                      icon: Symbols.light_mode,
+                      value: ThemeMode.light,
+                      groupValue: currentTheme,
+                      onChanged: (value) {
+                        if (value != null) {
+                          ThemeService.setTheme(value);
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                    _buildThemeOption(
+                      context,
+                      title: 'Dark Mode',
+                      icon: Symbols.dark_mode,
+                      value: ThemeMode.dark,
+                      groupValue: currentTheme,
+                      onChanged: (value) {
+                        if (value != null) {
+                          ThemeService.setTheme(value);
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                    _buildThemeOption(
+                      context,
+                      title: 'System Default',
+                      icon: Symbols.settings_brightness,
+                      value: ThemeMode.system,
+                      groupValue: currentTheme,
+                      onChanged: (value) {
+                        if (value != null) {
+                          ThemeService.setTheme(value);
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required ThemeMode value,
+    required ThemeMode groupValue,
+    required ValueChanged<ThemeMode?> onChanged,
+  }) {
+    final isSelected = value == groupValue;
+    return InkWell(
+      onTap: () => onChanged(value),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected 
+                ? Theme.of(context).colorScheme.primary 
+                : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  inherit: true,
+                  color: isSelected 
+                    ? Theme.of(context).colorScheme.primary 
+                    : Theme.of(context).colorScheme.onSurface,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ),
+            Radio<ThemeMode>(
+              value: value,
+              groupValue: groupValue,
+              onChanged: onChanged,
+              activeColor: Theme.of(context).colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

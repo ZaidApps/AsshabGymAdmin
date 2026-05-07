@@ -42,6 +42,7 @@ class MemberHistory {
   }
 
   // Action types for member history
+  static const String ACTION_MEMBER_CREATED = 'member_created';
   static const String ACTION_STATUS_CHANGED = 'status_changed';
   static const String ACTION_MEMBER_EDITED = 'member_edited';
   static const String ACTION_MEMBER_DELETED = 'member_deleted';

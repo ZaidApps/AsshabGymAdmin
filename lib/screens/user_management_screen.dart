@@ -40,13 +40,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  color: Theme.of(context).colorScheme.secondary,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   'Regular User',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -54,7 +54,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               ),
           ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [
           // Always show create user button for admins
           if (isAdmin)
@@ -94,14 +94,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   Icon(
                     Symbols.group,
                     size: 64,
-                    color: Colors.grey,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   ),
                   SizedBox(height: 16),
                   Text(
                     AppLocalizations.of(context).noMemberFound,
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                   SizedBox(height: 8),
@@ -109,7 +109,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     'Create your first user to get started',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -139,9 +139,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         onUserCreated: (success) {
           if (success && mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+               SnackBar(
                 content: Text('User created successfully'),
-                backgroundColor: Colors.green,
+                backgroundColor: Theme.of(context).colorScheme.primary,
               ),
             );
           }
@@ -158,9 +158,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         onActionCompleted: () {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+               SnackBar(
                 content: Text('Action completed successfully'),
-                backgroundColor: Colors.green,
+                backgroundColor: Theme.of(context).colorScheme.primary,
               ),
             );
           }
@@ -186,10 +186,10 @@ class UserCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: user.isAdmin ? Colors.purple : Colors.blue,
+          backgroundColor: user.isAdmin ? Theme.of(context).colorScheme.tertiary : Theme.of(context).colorScheme.primary,
           child: Icon(
             user.isAdmin ? Symbols.admin_panel_settings : Symbols.person,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
         title: Text(
@@ -203,21 +203,21 @@ class UserCard extends StatelessWidget {
             Text(
               'Role: ${user.role.name.toUpperCase()}',
               style: TextStyle(
-                color: user.isAdmin ? Colors.purple : Colors.blue,
+                color: user.isAdmin ? Theme.of(context).colorScheme.tertiary : Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
             Text(
               'Status: ${user.isActive ? 'Active' : 'Inactive'}',
               style: TextStyle(
-                color: user.isActive ? Colors.green : Colors.red,
+                color: user.isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
         trailing: isCurrentUser
-            ? const Icon(Symbols.person_pin, color: Colors.grey)
+            ?  Icon(Symbols.person_pin, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))
             : PopupMenuButton<String>(
                 onSelected: (value) => _handleAction(value, context),
                 itemBuilder: (context) => [
@@ -275,7 +275,7 @@ class UserCard extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
             child: Text(AppLocalizations.of(context).delete),
           ),
         ],
@@ -289,7 +289,7 @@ class UserCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success ? AppLocalizations.of(context).userDeletedSuccessfully : AppLocalizations.of(context).failedToDeleteUser),
-            backgroundColor: success ? Colors.green : Colors.red,
+            backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -303,7 +303,7 @@ class UserCard extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(success ? AppLocalizations.of(context).userStatusUpdated : AppLocalizations.of(context).failedToUpdateStatus),
-          backgroundColor: success ? Colors.green : Colors.red,
+          backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -341,7 +341,7 @@ class UserCard extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.secondary),
             child: const Text('Request Deletion'),
           ),
         ],
@@ -360,7 +360,7 @@ class UserCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success ? 'Deletion request submitted' : 'Failed to submit request'),
-            backgroundColor: success ? Colors.green : Colors.red,
+            backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
           ),
         );
       }

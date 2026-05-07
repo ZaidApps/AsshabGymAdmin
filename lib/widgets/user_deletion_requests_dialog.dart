@@ -40,7 +40,7 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
             // Header
             Row(
               children: [
-                const Icon(Symbols.approval, color: Colors.orange),
+                Icon(Symbols.approval, color: Theme.of(context).colorScheme.secondary),
                 const SizedBox(width: 8),
                 const Text(
                   'User Deletion Requests',
@@ -76,21 +76,21 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
                   final requests = snapshot.data ?? [];
 
                   if (requests.isEmpty) {
-                    return const Center(
+                    return  Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Symbols.check_circle,
                             size: 64,
-                            color: Colors.green,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           SizedBox(height: 16),
                           Text(
                             'No pending deletion requests',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                         ],
@@ -143,7 +143,7 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
             child: Text(AppLocalizations.of(context).confirm),
           ),
         ],
@@ -160,7 +160,7 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success ? 'User deleted successfully' : 'Failed to delete user'),
-            backgroundColor: success ? Colors.green : Colors.red,
+            backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
           ),
         );
         if (success) {
@@ -202,7 +202,7 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.secondary),
             child: Text(AppLocalizations.of(context).deleteMember),
           ),
         ],
@@ -220,7 +220,7 @@ class _UserDeletionRequestsDialogState extends State<UserDeletionRequestsDialog>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success ? 'Request rejected' : 'Failed to reject request'),
-            backgroundColor: success ? Colors.green : Colors.red,
+            backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
           ),
         );
         if (success) {
@@ -255,10 +255,10 @@ class DeletionRequestCard extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.orange,
-                  child: const Icon(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  child:  Icon(
                     Symbols.person_remove,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -277,7 +277,7 @@ class DeletionRequestCard extends StatelessWidget {
                         Text(
                           'Requested by: ${request.requestedByEmail}',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontSize: 12,
                           ),
                         ),
@@ -287,7 +287,7 @@ class DeletionRequestCard extends StatelessWidget {
                 Text(
                   _formatDate(request.createdAt!.toDate()),
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     fontSize: 12,
                   ),
                 ),
@@ -298,7 +298,7 @@ class DeletionRequestCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -315,14 +315,14 @@ class DeletionRequestCard extends StatelessWidget {
                   onPressed: onReject,
                   icon: const Icon(Symbols.close, size: 16),
                   label: const Text('Reject'),
-                  style: TextButton.styleFrom(foregroundColor: Colors.orange),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.secondary),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: onApprove,
                   icon: const Icon(Symbols.delete, size: 16),
                   label: const Text('Approve Deletion'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
                 ),
               ],
             ),

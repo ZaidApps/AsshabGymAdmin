@@ -45,14 +45,14 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
         children: [
           Icon(
             Symbols.refresh,
-            color: AppTheme.primaryColor,
+            color: Theme.of(context).colorScheme.primary,
             size: 24,
           ),
           const SizedBox(width: 12),
           Text(
             AppLocalizations.of(context).renewSubscription,
             style: AppTheme.heading3.copyWith(
-              color: AppTheme.onSurfaceColor,
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -69,7 +69,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -79,7 +79,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
                       AppLocalizations.of(context).currentSubscription,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey[700],
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -98,7 +98,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
               Text(
                 AppLocalizations.of(context).newSubscriptionDetails,
                 style: AppTheme.heading3.copyWith(
-                  color: AppTheme.onSurfaceColor,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -115,10 +115,10 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
                 leading: const Icon(Symbols.calendar_month),
                 trailing: const Icon(Symbols.arrow_drop_down),
                 onTap: _selectStartDate,
-                tileColor: Colors.grey[50],
+                tileColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: Colors.grey[300]!),
+                  side: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
               ),
               const SizedBox(height: 12),
@@ -134,10 +134,10 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
                 leading: const Icon(Symbols.calendar_today),
                 trailing: const Icon(Symbols.arrow_drop_down),
                 onTap: _selectExpiryDate,
-                tileColor: Colors.grey[50],
+                tileColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: Colors.grey[300]!),
+                  side: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
               ),
               const SizedBox(height: 12),
@@ -174,8 +174,8 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
         ElevatedButton(
           onPressed: _renewSubscription,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.primaryColor,
-            foregroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
           child: Text(AppLocalizations.of(context).renewSubscription),
         ),
@@ -221,7 +221,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(
           content: Text(AppLocalizations.of(context).pleaseSelectAStartDate),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -231,7 +231,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(
           content: Text(AppLocalizations.of(context).pleaseSelectAnExpiryDate),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -241,7 +241,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(
           content: Text(AppLocalizations.of(context).expiryDateMustBeAfterStartDate),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -252,7 +252,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(
           content: Text(AppLocalizations.of(context).pleaseEnterAValidSubscriptionAmount),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -294,7 +294,7 @@ class _RenewSubscriptionDialogState extends State<RenewSubscriptionDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
            SnackBar(
             content: Text(AppLocalizations.of(context).failedToRenewSubscription),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }

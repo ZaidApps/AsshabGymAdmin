@@ -29,20 +29,20 @@ class _ExpiredCheckinsScreenState extends State<ExpiredCheckinsScreen> {
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    backgroundColor: AppTheme.backgroundColor,
+    backgroundColor: Theme.of(context).colorScheme.background,
     appBar: AppBar(
       title: Row(
         children: [
           Icon(
             Symbols.warning,
-            color: AppTheme.errorColor,
+            color: Theme.of(context).colorScheme.error,
             size: 24,
           ),
           const SizedBox(width: 12),
           Text(
             AppLocalizations.of(context).expiredCheckins,
-            style: AppTheme.heading2.copyWith(
-              color: AppTheme.onSurfaceColor,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -51,14 +51,14 @@ Widget build(BuildContext context) {
       actions: [
         Container(
           decoration: BoxDecoration(
-            color: AppTheme.surfaceColor,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
           ),
           child: PopupMenuButton<String>(
             icon: Icon(
               Symbols.filter_list,
-              color: AppTheme.onSurfaceColor,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 20,
             ),
             onSelected: (value) {
@@ -80,7 +80,7 @@ Widget build(BuildContext context) {
         // Search and Filter Section
         Container(
           padding: const EdgeInsets.all(16),
-          color: AppTheme.surfaceColor,
+          color: Theme.of(context).colorScheme.surface,
           child: Column(
             children: [
               // Search Field
@@ -88,10 +88,10 @@ Widget build(BuildContext context) {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context).searchByNameOrPhone,
-                  prefixIcon: const Icon(Symbols.search, color: AppTheme.onBackgroundColor),
+                  prefixIcon:  Icon(Symbols.search, color: Theme.of(context).colorScheme.onBackground),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Symbols.clear, color: AppTheme.onBackgroundColor),
+                          icon:  Icon(Symbols.clear, color: Theme.of(context).colorScheme.onBackground),
                           onPressed: () {
                             _searchController.clear();
                             setState(() {});
@@ -100,14 +100,14 @@ Widget build(BuildContext context) {
                       : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: const Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppTheme.primaryColor),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: Theme.of(context).colorScheme.surface,
                 ),
                 onChanged: (value) {
                   setState(() {});
@@ -138,14 +138,14 @@ Widget build(BuildContext context) {
                   const SizedBox(width: 8),
                   Container(
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceColor,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
                     child: PopupMenuButton<String>(
                       icon: Icon(
                         Symbols.filter_list,
-                        color: AppTheme.onSurfaceColor,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
                       onSelected: (value) {
@@ -163,7 +163,7 @@ Widget build(BuildContext context) {
                   ),
                   if (_startDate != null || _endDate != null)
                     IconButton(
-                      icon: const Icon(Symbols.clear, color: AppTheme.errorColor),
+                      icon:  Icon(Symbols.clear, color: Theme.of(context).colorScheme.error),
                       onPressed: () {
                         setState(() {
                           _startDate = null;
@@ -194,20 +194,20 @@ Widget build(BuildContext context) {
                       Icon(
                         Symbols.error,
                         size: 64,
-                        color: AppTheme.errorColor,
+                        color: Theme.of(context).colorScheme.error,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'Error loading expired check-ins',
-                        style: AppTheme.bodyLarge.copyWith(
-                          color: AppTheme.errorColor,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.error,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Please try again later',
-                        style: AppTheme.bodyMedium.copyWith(
-                          color: AppTheme.onBackgroundColor,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onBackground,
                         ),
                       ),
                     ],
@@ -226,28 +226,28 @@ Widget build(BuildContext context) {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceColor,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: Theme.of(context).colorScheme.outline),
                         ),
                         child: Icon(
                           Symbols.check_circle,
                           size: 64,
-                          color: AppTheme.successColor,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 24),
                       Text(
                         AppLocalizations.of(context).noExpiryCheckIn,
-                        style: AppTheme.bodyLarge.copyWith(
-                          color: AppTheme.onBackgroundColor,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onBackground,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         AppLocalizations.of(context).allValidCheckIn,
-                        style: AppTheme.bodyMedium.copyWith(
-                          color: AppTheme.onBackgroundColor,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onBackground,
                         ),
                       ),
                     ],
@@ -259,7 +259,7 @@ Widget build(BuildContext context) {
                 onRefresh: () async {
                   // Refresh logic here if needed
                 },
-                color: AppTheme.primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: filteredAttempts.length,
@@ -361,12 +361,12 @@ class ExpiredCheckInCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.errorColor.withOpacity(0.2)),
+        border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.2)),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.errorColor.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.error.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -383,15 +383,15 @@ class ExpiredCheckInCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: AppTheme.errorColor.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: CircleAvatar(
                     radius: 24,
-                    backgroundColor: AppTheme.errorColor,
+                    backgroundColor: Theme.of(context).colorScheme.error,
                     child: Icon(
                       Symbols.warning,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       size: 24,
                     ),
                   ),
@@ -403,9 +403,9 @@ class ExpiredCheckInCard extends StatelessWidget {
                     children: [
                       Text(
                         attempt.memberName ?? 'Expired Check-in Attempt',
-                        style: AppTheme.bodyLarge.copyWith(
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.errorColor,
+                          color: Theme.of(context).colorScheme.error,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -414,13 +414,13 @@ class ExpiredCheckInCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppTheme.errorColor.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           _formatDate(attempt.timestamp.toDate()),
-                          style: AppTheme.bodySmall.copyWith(
-                            color: AppTheme.errorColor,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -437,12 +437,12 @@ class ExpiredCheckInCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDetailRow('Phone Number', attempt.phoneNumber ?? 'Unknown', Symbols.phone),
-                _buildDetailRow('Device ID', attempt.deviceId ?? 'Unknown', Symbols.devices),
+                _buildDetailRow(context, 'Phone Number', attempt.phoneNumber ?? 'Unknown', Symbols.phone),
+                _buildDetailRow(context, 'Device ID', attempt.deviceId ?? 'Unknown', Symbols.devices),
                 if (attempt.memberName != null)
-                  _buildDetailRow('Member Name', attempt.memberName!, Symbols.person),
+                  _buildDetailRow(context, 'Member Name', attempt.memberName!, Symbols.person),
                 if (attempt.subscriptionExpiryDate != null)
-                  _buildDetailRow('Subscription Expired', _formatDate(attempt.subscriptionExpiryDate!.toDate()), Icons.event_busy),
+                  _buildDetailRow(context, 'Subscription Expired', _formatDate(attempt.subscriptionExpiryDate!.toDate()), Icons.event_busy),
               ],
             ),
             
@@ -484,7 +484,7 @@ class ExpiredCheckInCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, IconData icon) {
+  Widget _buildDetailRow(BuildContext context, String label, String value, IconData icon) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -492,14 +492,14 @@ class ExpiredCheckInCard extends StatelessWidget {
           Icon(
             icon,
             size: 16,
-            color: AppTheme.onBackgroundColor,
+            color: Theme.of(context).colorScheme.onBackground,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
-              style: AppTheme.bodySmall.copyWith(
-                color: AppTheme.onBackgroundColor,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onBackground,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -519,15 +519,15 @@ class ExpiredCheckInCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Phone Number', attempt.phoneNumber ?? 'Unknown', Symbols.phone),
-              _buildDetailRow('Device ID', attempt.deviceId ?? 'Unknown', Symbols.devices),
+              _buildDetailRow(context, 'Phone Number', attempt.phoneNumber ?? 'Unknown', Symbols.phone),
+              _buildDetailRow(context, 'Device ID', attempt.deviceId ?? 'Unknown', Symbols.devices),
               if (attempt.memberName != null)
-                _buildDetailRow('Member Name', attempt.memberName!, Symbols.person),
+                _buildDetailRow(context, 'Member Name', attempt.memberName!, Symbols.person),
               if (attempt.memberDocId != null)
-                _buildDetailRow('Member ID', attempt.memberDocId!, Icons.person_pin),
+                _buildDetailRow(context, 'Member ID', attempt.memberDocId!, Icons.person_pin),
               if (attempt.subscriptionExpiryDate != null)
-                _buildDetailRow('Subscription Expired', _formatDate(attempt.subscriptionExpiryDate!.toDate()), Icons.event_busy),
-              _buildDetailRow('Attempt Time', _formatDate(attempt.timestamp.toDate()), Symbols.schedule),
+                _buildDetailRow(context, 'Subscription Expired', _formatDate(attempt.subscriptionExpiryDate!.toDate()), Icons.event_busy),
+              _buildDetailRow(context, 'Attempt Time', _formatDate(attempt.timestamp.toDate()), Symbols.schedule),
             ],
           ),
         ),
@@ -568,16 +568,16 @@ class ExpiredCheckInCard extends StatelessWidget {
               // Implement renewal logic here
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                   SnackBar(
                     content: Text('Subscription renewal feature coming soon'),
-                    backgroundColor: AppTheme.warningColor,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                   ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.successColor,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.surface,
             ),
             child: const Text('Renew'),
           ),
@@ -611,16 +611,16 @@ class ExpiredCheckInCard extends StatelessWidget {
               // Implement delete logic here
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                   SnackBar(
                     content: Text('Delete feature coming soon'),
-                    backgroundColor: AppTheme.warningColor,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                   ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.errorColor,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.surface,
             ),
             child: const Text('Delete'),
           ),

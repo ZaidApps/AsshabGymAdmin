@@ -9,6 +9,11 @@ class Member {
   final Timestamp? subscriptionStartDate;
   final Timestamp? subscriptionExpiryDate;
   final double? subscriptionAmount;
+  final double? paidAmount;
+  final double? remainingBalance;
+  final bool isFrozen;
+  final Timestamp? frozenAt;
+  final int? remainingDaysAtFreeze;
   final Timestamp? createdAt;
   final Timestamp? updatedAt;
 
@@ -21,6 +26,11 @@ class Member {
     this.subscriptionStartDate,
     this.subscriptionExpiryDate,
     this.subscriptionAmount,
+    this.paidAmount,
+    this.remainingBalance,
+    this.isFrozen = false,
+    this.frozenAt,
+    this.remainingDaysAtFreeze,
     this.createdAt,
     this.updatedAt,
   });
@@ -36,6 +46,11 @@ class Member {
       subscriptionStartDate: data['subscription_start_date'],
       subscriptionExpiryDate: data['subscription_expiry_date'],
       subscriptionAmount: data['subscription_amount']?.toDouble(),
+      paidAmount: data['paid_amount']?.toDouble(),
+      remainingBalance: data['remaining_balance']?.toDouble(),
+      isFrozen: data['is_frozen'] ?? false,
+      frozenAt: data['frozen_at'],
+      remainingDaysAtFreeze: data['remaining_days_at_freeze'],
       createdAt: data['created_at'],
       updatedAt: data['updated_at'],
     );
@@ -51,6 +66,11 @@ class Member {
       'subscription_start_date': subscriptionStartDate,
       'subscription_expiry_date': subscriptionExpiryDate,
       'subscription_amount': subscriptionAmount,
+      'paid_amount': paidAmount,
+      'remaining_balance': remainingBalance,
+      'is_frozen': isFrozen,
+      'frozen_at': frozenAt,
+      'remaining_days_at_freeze': remainingDaysAtFreeze,
       'created_at': createdAt ?? FieldValue.serverTimestamp(),
       'updated_at': updatedAt ?? FieldValue.serverTimestamp(),
     };
@@ -67,6 +87,74 @@ class Member {
   bool get isExpired {
     if (!isActive || subscriptionExpiryDate == null) return false;
     return DateTime.now().isAfter(subscriptionExpiryDate!.toDate());
+  }
+
+  // Calculate remaining days in subscription
+  int? get remainingDays {
+    if (subscriptionExpiryDate == null) return null;
+    final now = DateTime.now();
+    final expiry = subscriptionExpiryDate!.toDate();
+    if (now.isAfter(expiry)) return 0;
+    return expiry.difference(now).inDays;
+  }
+
+  // Payment-related getters
+  bool get hasOutstandingBalance {
+    if (remainingBalance == null) return false;
+    return remainingBalance! > 0;
+  }
+
+  bool get hasOverpaid {
+    if (remainingBalance == null) return false;
+    return remainingBalance! < 0;
+  }
+
+  bool get isFullyPaid {
+    if (remainingBalance == null) return true;
+    return remainingBalance! <= 0;
+  }
+
+  String get formattedRemainingBalance {
+    if (remainingBalance == null) return '0.00';
+    final balance = remainingBalance!.abs();
+    return balance.toStringAsFixed(2);
+  }
+
+  // Create a copy with updated fields
+  Member copyWith({
+    String? deviceId,
+    String? memberDocId,
+    String? phoneNumber,
+    String? memberName,
+    String? membershipStatus,
+    Timestamp? subscriptionStartDate,
+    Timestamp? subscriptionExpiryDate,
+    double? subscriptionAmount,
+    double? paidAmount,
+    double? remainingBalance,
+    bool? isFrozen,
+    Timestamp? frozenAt,
+    int? remainingDaysAtFreeze,
+    Timestamp? createdAt,
+    Timestamp? updatedAt,
+  }) {
+    return Member(
+      deviceId: deviceId ?? this.deviceId,
+      memberDocId: memberDocId ?? this.memberDocId,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      memberName: memberName ?? this.memberName,
+      membershipStatus: membershipStatus ?? this.membershipStatus,
+      subscriptionStartDate: subscriptionStartDate ?? this.subscriptionStartDate,
+      subscriptionExpiryDate: subscriptionExpiryDate ?? this.subscriptionExpiryDate,
+      subscriptionAmount: subscriptionAmount ?? this.subscriptionAmount,
+      paidAmount: paidAmount ?? this.paidAmount,
+      remainingBalance: remainingBalance ?? this.remainingBalance,
+      isFrozen: isFrozen ?? this.isFrozen,
+      frozenAt: frozenAt ?? this.frozenAt,
+      remainingDaysAtFreeze: remainingDaysAtFreeze ?? this.remainingDaysAtFreeze,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }
 

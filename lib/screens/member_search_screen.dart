@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../models/member.dart';
 import '../services/firebase_service.dart';
-import '../theme/app_theme.dart';
 import 'member_history_screen.dart';
 import '../l10n/app_localizations.dart';
 
@@ -30,20 +29,20 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: Row(
           children: [
             Icon(
               Symbols.search,
-              color: AppTheme.primaryColor,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 24,
             ),
             const SizedBox(width: 12),
             Text(
               AppLocalizations.of(context).members,
-              style: AppTheme.heading2.copyWith(
-                color: AppTheme.onSurfaceColor,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -59,11 +58,11 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceColor,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.08),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
@@ -76,16 +75,16 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                   children: [
                     Text(
                       AppLocalizations.of(context).searchMember,
-                      style: AppTheme.heading3.copyWith(
-                        color: AppTheme.onSurfaceColor,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       AppLocalizations.of(context).enterMemberNameOrPhoneToFindHistory,
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppTheme.onBackgroundColor,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -94,10 +93,10 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context).searchByNameOrPhone,
                         hintText: AppLocalizations.of(context).enterMemberNameOrPhoneToFindHistory,
-                        prefixIcon: const Icon(Symbols.search, color: AppTheme.onBackgroundColor),
+                        prefixIcon: const Icon(Symbols.search),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(Symbols.clear, color: AppTheme.onBackgroundColor),
+                                icon: const Icon(Symbols.clear),
                                 onPressed: () {
                                   _searchController.clear();
                                   setState(() {
@@ -109,14 +108,14 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                             : null,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: const Color(0xFFE2E8F0)),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppTheme.primaryColor),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: Theme.of(context).colorScheme.surface,
                       ),
                       keyboardType: TextInputType.text,
                       validator: (value) {
@@ -136,8 +135,8 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _searchMember,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryColor,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -160,8 +159,8 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                                   const SizedBox(width: 8),
                                   Text(
                                     AppLocalizations.of(context).searchMemberButton,
-                                    style: AppTheme.bodyLarge.copyWith(
-                                      color: Colors.white,
+                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Theme.of(context).colorScheme.onPrimary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -174,23 +173,23 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppTheme.errorColor.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppTheme.errorColor.withOpacity(0.2)),
+                          border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Symbols.error,
-                              color: AppTheme.errorColor,
+                              color: Theme.of(context).colorScheme.error,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 _errorMessage!,
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.errorColor,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.error,
                                 ),
                               ),
                             ),
@@ -209,8 +208,8 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
             if (_searchResults.isNotEmpty || _isLoading) ...[
               Text(
                 AppLocalizations.of(context).searchResults,
-                style: AppTheme.heading3.copyWith(
-                  color: AppTheme.onSurfaceColor,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -276,7 +275,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(
           content: Text(AppLocalizations.of(context).invalidMemberId),
-          backgroundColor: AppTheme.errorColor,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -305,12 +304,12 @@ class MemberSearchResultCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -330,7 +329,14 @@ class MemberSearchResultCard extends StatelessWidget {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Icon(
@@ -349,9 +355,9 @@ class MemberSearchResultCard extends StatelessWidget {
                     children: [
                       Text(
                         member.memberName ?? 'Unknown Member',
-                        style: AppTheme.bodyLarge.copyWith(
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.onSurfaceColor,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -361,15 +367,15 @@ class MemberSearchResultCard extends StatelessWidget {
                         children: [
                           Icon(
                             Symbols.phone,
-                            color: AppTheme.onBackgroundColor,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             size: 16,
                           ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               member.phoneNumber ?? 'No phone',
-                              style: AppTheme.bodyMedium.copyWith(
-                                color: AppTheme.onBackgroundColor,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -380,13 +386,13 @@ class MemberSearchResultCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(member.membershipStatus).withOpacity(0.1),
+                          color: _getStatusColor(context, member.membershipStatus).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           member.membershipStatus.toUpperCase(),
-                          style: AppTheme.bodySmall.copyWith(
-                            color: _getStatusColor(member.membershipStatus),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: _getStatusColor(context, member.membershipStatus),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -398,7 +404,7 @@ class MemberSearchResultCard extends StatelessWidget {
                 // Arrow Icon
                 Icon(
                   Symbols.chevron_right,
-                  color: AppTheme.onBackgroundColor,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   size: 24,
                 ),
               ],
@@ -409,16 +415,16 @@ class MemberSearchResultCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return AppTheme.successColor;
+        return Theme.of(context).colorScheme.primary;
       case 'pending':
-        return AppTheme.warningColor;
+        return Theme.of(context).colorScheme.secondary;
       case 'inactive':
-        return AppTheme.errorColor;
+        return Theme.of(context).colorScheme.error;
       default:
-        return Colors.grey;
+        return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
     }
   }
 }

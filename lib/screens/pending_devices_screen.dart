@@ -22,7 +22,7 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).pendingDevices),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: StreamBuilder<List<PendingDeviceRegistration>>(
         stream: _firebaseService.getPendingRegistrations(),
@@ -47,14 +47,14 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                   Icon(
                     Symbols.devices,
                     size: 64,
-                    color: Colors.grey,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   ),
                   SizedBox(height: 16),
                   Text(
                     AppLocalizations.of(context).noPendingDevicesFound,
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                   SizedBox(height: 8),
@@ -62,7 +62,7 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                     AppLocalizations.of(context).newDeviceRegistrationsWillAppearHere,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -102,8 +102,8 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                       ElevatedButton(
                         onPressed: () => _showActivateMemberDialog(device),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         ),
                         child: const Text('Activate'),
                       ),
@@ -111,8 +111,8 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                       ElevatedButton(
                         onPressed: () => _showRejectDeviceDialog(device),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         ),
                         child: Text(AppLocalizations.of(context).rejectDevice),
                       ),
@@ -149,7 +149,7 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
       context: context,
       builder: (context) => ActivateMemberDialog(
         device: device,
-        onActivate: (phoneNumber, memberName, startDate, expiryDate, subscriptionAmount) async {
+        onActivate: (phoneNumber, memberName, startDate, expiryDate, subscriptionAmount, paidAmount) async {
           if (await _firebaseService.activateMember(
             memberDocId: device.memberDocId!,
             phoneNumber: phoneNumber,
@@ -157,12 +157,13 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
             subscriptionStartDate: startDate,
             subscriptionExpiryDate: expiryDate,
             subscriptionAmount: subscriptionAmount,
+            paidAmount: paidAmount,
           )) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                 SnackBar(
                   content: Text('Member activated successfully!'),
-                  backgroundColor: Colors.green,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
               );
               Navigator.of(context).pop();
@@ -170,9 +171,9 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
           } else {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                 SnackBar(
                   content: Text('Failed to activate member'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
               );
             }
@@ -234,14 +235,14 @@ class _PendingDevicesScreenState extends State<PendingDevicesScreen> {
                       success ? AppLocalizations.of(context).deviceRejectedSuccessfully 
                              : AppLocalizations.of(context).failedToRejectDevice,
                     ),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
                   ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
             child: Text(AppLocalizations.of(context).reject),
           ),

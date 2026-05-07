@@ -5,24 +5,22 @@ import '../models/offer.dart';
 import '../services/firebase_service.dart';
 import '../l10n/app_localizations.dart';
 
-class ActivateMemberDialog extends StatefulWidget {
-  final PendingDeviceRegistration device;
-  final Function(String phoneNumber, String memberName, DateTime startDate, DateTime expiryDate, double subscriptionAmount, double paidAmount) onActivate;
+class EnhancedRenewSubscriptionDialog extends StatefulWidget {
+  final Member member;
+  final Function(DateTime startDate, DateTime expiryDate, double subscriptionAmount, double paidAmount) onRenew;
 
-  const ActivateMemberDialog({
+  const EnhancedRenewSubscriptionDialog({
     super.key,
-    required this.device,
-    required this.onActivate,
+    required this.member,
+    required this.onRenew,
   });
 
   @override
-  State<ActivateMemberDialog> createState() => _ActivateMemberDialogState();
+  State<EnhancedRenewSubscriptionDialog> createState() => _EnhancedRenewSubscriptionDialogState();
 }
 
-class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
+class _EnhancedRenewSubscriptionDialogState extends State<EnhancedRenewSubscriptionDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
-  final _nameController = TextEditingController();
   final _amountController = TextEditingController();
   final _paidAmountController = TextEditingController();
   final FirebaseService _firebaseService = FirebaseService();
@@ -108,8 +106,6 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
   
   @override
   void dispose() {
-    _phoneController.dispose();
-    _nameController.dispose();
     _amountController.dispose();
     _paidAmountController.dispose();
     super.dispose();
@@ -120,9 +116,9 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
     return AlertDialog(
       title: Row(
         children: [
-          const Icon(Symbols.person_add, color: Colors.green),
+          const Icon(Symbols.refresh, color: Colors.green),
           const SizedBox(width: 8),
-          Text(AppLocalizations.of(context).activateMember),
+          Text(AppLocalizations.of(context).renewSubscription),
         ],
       ),
       content: SingleChildScrollView(
@@ -132,72 +128,33 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Device Information
+              // Member Information
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Device Information',
+                      'Member Information',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey[700],
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text('Device ID: ${widget.device.deviceId ?? "Unknown"}'),
-                    Text('Platform: ${widget.device.platform.toUpperCase()}'),
-                    if (widget.device.createdAt != null)
-                      Text('Registered: ${_formatDate(widget.device.createdAt!.toDate())}'),
+                    Text('Name: ${widget.member.memberName ?? widget.member.phoneNumber ?? "Unknown"}'),
+                    Text('Phone: ${widget.member.phoneNumber ?? "Unknown"}'),
+                    if (widget.member.subscriptionStartDate != null)
+                      Text('Current Expiry: ${_formatDate(widget.member.subscriptionExpiryDate!.toDate())}'),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Member Name Field
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context).memberName,
-                  hintText: 'Enter member name',
-                  prefixIcon: const Icon(Symbols.person),
-                  border: const OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter member name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Phone Number Field
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context).phoneNumber,
-                  hintText: 'Enter member phone number',
-                  prefixIcon: const Icon(Symbols.phone),
-                  border: const OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a phone number';
-                  }
-                  if (!RegExp(r'^[0-9]{10,15}$').hasMatch(value)) {
-                    return 'Please enter a valid phone number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
 
               // Subscription Duration Selection
               Text(
@@ -252,8 +209,9 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline),
                       ),
                       child: Row(
                         children: [
@@ -273,17 +231,18 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                     return Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.red[50],
+                        color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         children: [
-                          Icon(Symbols.error, color: Colors.red[600]),
+                          Icon(Symbols.error, color: Theme.of(context).colorScheme.error),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               AppLocalizations.of(context).errorLoadingOffers.replaceAll('{error}', snapshot.error.toString()),
-                              style: TextStyle(color: Colors.red[600]),
+                              style: TextStyle(color: Theme.of(context).colorScheme.error),
                             ),
                           ),
                         ],
@@ -297,17 +256,18 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                     return Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline),
                       ),
                       child: Row(
                         children: [
-                          Icon(Symbols.info, color: Colors.grey[600]),
+                          Icon(Symbols.info, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               AppLocalizations.of(context).noActiveOffersAvailable,
-                              style: TextStyle(color: Colors.grey[600]),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                             ),
                           ),
                         ],
@@ -320,7 +280,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                       value: null,
                       child: Row(
                         children: [
-                          Icon(Symbols.money_off, color: Colors.grey[600], size: 20),
+                          Icon(Symbols.money_off, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
                           const SizedBox(width: 8),
                           Text(
                             AppLocalizations.of(context).noOfferUseStandardPricing,
@@ -350,7 +310,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -362,7 +322,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                               '${offer.baseDurationMonths} month${offer.baseDurationMonths > 1 ? 's' : ''} + ${offer.additionalDays} days - \$${offer.totalAmount.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                             ),
                           ],
@@ -371,33 +331,10 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                     )),
                   ];
 
-                  if (offers.isEmpty) {
-                    return Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[300]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Symbols.info, color: Colors.grey[600]),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'No active offers available',
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
                   return Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<Offer?>(
@@ -409,7 +346,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                             AppLocalizations.of(context).selectOffer,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                         ),
@@ -417,8 +354,8 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                         onChanged: (Offer? newValue) {
                           _onOfferChanged(newValue);
                         },
-                        icon: Icon(Symbols.arrow_drop_down, color: Colors.grey[600]),
-                        dropdownColor: Colors.white,
+                        icon: Icon(Symbols.arrow_drop_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                        dropdownColor: Theme.of(context).colorScheme.surface,
                         elevation: 2,
                       ),
                     ),
@@ -433,8 +370,10 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).subscriptionAmount,
                   hintText: 'Enter subscription amount paid',
-                  prefixIcon: Icon(Symbols.currency_exchange),
+                  prefixIcon: Icon(Symbols.currency_exchange, color: Theme.of(context).colorScheme.onSurface),
                   border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
                 ),
                 keyboardType: TextInputType.number,
                 enabled: _isCustomDuration() && _selectedOffer == null,
@@ -456,8 +395,10 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).amountPaid,
                   hintText: AppLocalizations.of(context).enterAmountPaid,
-                  prefixIcon: Icon(Symbols.payments),
+                  prefixIcon: Icon(Symbols.payments, color: Theme.of(context).colorScheme.onSurface),
                   border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -480,22 +421,22 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                       ? _formatDate(_selectedStartDate!)
                       : 'Select start date',
                 ),
-                leading: const Icon(Symbols.calendar_month),
-                trailing: const Icon(Symbols.arrow_drop_down),
+                leading: Icon(Symbols.calendar_month, color: Theme.of(context).colorScheme.onSurface),
+                trailing: Icon(Symbols.arrow_drop_down, color: Theme.of(context).colorScheme.onSurface),
                 onTap: (_isCustomDuration() && _selectedOffer == null) ? _selectStartDate : null,
-                tileColor: Colors.grey[50],
+                tileColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: Colors.grey[300]!),
+                  side: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
               ),
               if (_selectedStartDate == null)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8, left: 12),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 12),
                   child: Text(
                     'Please select a start date',
                     style: TextStyle(
-                      color: Colors.red,
+                      color: Theme.of(context).colorScheme.error,
                       fontSize: 12,
                     ),
                   ),
@@ -510,22 +451,22 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
                       ? _formatDate(_selectedExpiryDate!)
                       : 'Select expiry date',
                 ),
-                leading: const Icon(Symbols.calendar_today),
-                trailing: const Icon(Symbols.arrow_drop_down),
+                leading: Icon(Symbols.calendar_today, color: Theme.of(context).colorScheme.onSurface),
+                trailing: Icon(Symbols.arrow_drop_down, color: Theme.of(context).colorScheme.onSurface),
                 onTap: (_isCustomDuration() && _selectedOffer == null) ? _selectExpiryDate : null,
-                tileColor: Colors.grey[50],
+                tileColor: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: Colors.grey[300]!),
+                  side: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
               ),
               if (_selectedExpiryDate == null)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8, left: 12),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 12),
                   child: Text(
                     'Please select an expiry date',
                     style: TextStyle(
-                      color: Colors.red,
+                      color: Theme.of(context).colorScheme.error,
                       fontSize: 12,
                     ),
                   ),
@@ -540,12 +481,12 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
           child: Text(AppLocalizations.of(context).cancel),
         ),
         ElevatedButton(
-          onPressed: _activateMember,
+          onPressed: _renewSubscription,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
-          child: Text(AppLocalizations.of(context).activateMember),
+          child: Text(AppLocalizations.of(context).renewSubscription),
         ),
       ],
     );
@@ -589,10 +530,10 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: _selectedDuration == value ? Colors.green : Colors.grey[300]!,
+          color: _selectedDuration == value ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline,
           width: _selectedDuration == value ? 2 : 1,
         ),
-        color: _selectedDuration == value ? Colors.green.withValues(alpha: 0.1) : Colors.white,
+        color: _selectedDuration == value ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
       ),
       child: RadioListTile<String>(
         value: value,
@@ -614,18 +555,17 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
               'Amount: $amount',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             )
           : null,
-        activeColor: Colors.green,
+        activeColor: Theme.of(context).colorScheme.primary,
         contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
     );
   }
 
-  
-  void _activateMember() {
+  void _renewSubscription() {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -683,9 +623,7 @@ class _ActivateMemberDialogState extends State<ActivateMemberDialog> {
       return;
     }
 
-    widget.onActivate(
-      _phoneController.text,
-      _nameController.text.isNotEmpty ? _nameController.text : _phoneController.text,
+    widget.onRenew(
       _selectedStartDate!,
       _selectedExpiryDate!,
       subscriptionAmount,
